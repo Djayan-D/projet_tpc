@@ -7,7 +7,8 @@ library(dplyr)
 library(tidyr)
 library(EnvStats)
 library(moments)
-library(tibble) 
+library(tibble)
+library(seasonal)
 
 
 
@@ -66,11 +67,11 @@ freq_mens_cinema_0024_long$Date <- as.yearmon(paste(freq_mens_cinema_0024_long$A
 
 
 
-#----- 2.3. Analyse des données -----
+#---------- 3. ANALYSE DES DONNÉES ----------
 
-#--- 2.3.1. Statistiques descriptives. ---
+#----- 3.1. Statistiques descriptives -----
 
-# Créer une fonction
+#--- 3.1.1. Créer une fonction ---
 
 stats_desc <- function(data) {
   # Calcul des statistiques de base
@@ -97,21 +98,21 @@ stats_desc <- function(data) {
 
 
 
-# Appliquer à la série 1980-2024
+#--- 3.1.2. Appliquer à la série 1980-2024 ---
 
 stats_desc(freq_mens_cinema_long$Valeur)
 
 
 
-# Appliquer à la série 2000-2024
+#--- 3.1.3. Appliquer à la série 2000-2024 ---
 
 stats_desc(freq_mens_cinema_0024_long$Valeur)
 
 
 
-#--- 2.3.2. Vérifier les valeurs atypiques ---
+#----- 3.2. Vérifier les valeurs atypiques -----
 
-#- 2.3.2.1. Boxplots -
+#--- 3.2.1. Boxplots ---
 
 # Boxplots
 
@@ -128,31 +129,42 @@ boxplot(freq_mens_cinema_0024_long$Valeur,
 
 
 
-#- 2.3.2.2. Rsoner Test -
+#--- 3.2.2. Rosner Test ---
 
 rosnerTest(freq_mens_cinema_long$Valeur,
            k = 3)
 
 ## Aucune valeur réellement atypique, pas besoin de modifier la base.
+## Les stats descriptives n'ont pas besoin d'être recalculées.
 
 
 rosnerTest(freq_mens_cinema_0024_long$Valeur,
            k = 4)
 
 ## Aucune valeur réellement atypique, pas besoin de modifier la base.
-
-
-#----- 2.4. Convertir en TS -----
-
-#--- 2.4.1. Convertir en séries temporelles ---
-
-ts_freq_mens_cinema <- zoo(freq_mens_cinema_long$Valeur, order.by = freq_mens_cinema_long$Date)
-
-ts_freq_mens_cinema_0024 <- zoo(freq_mens_cinema_0024_long$Valeur, order.by = freq_mens_cinema_0024_long$Date)
+## Les stats descriptives n'ont pas besoin d'être recalculées.
 
 
 
-#--- 2.4.2. Visualiser les séries temporelles
+#----- 3.3. Convertir et visualiser les TS -----
+
+#--- 3.3.1. Convertir en ZOO et en TS ---
+
+# ZOO
+
+zoo_freq_mens_cinema <- zoo(freq_mens_cinema_long$Valeur, order.by = freq_mens_cinema_long$Date)
+
+zoo_freq_mens_cinema_0024 <- zoo(freq_mens_cinema_0024_long$Valeur, order.by = freq_mens_cinema_0024_long$Date)
+
+# TS
+
+ts_freq_mens_cinema <- as.ts(zoo_freq_mens_cinema)
+
+ts_freq_mens_cinema_0024 <- as.ts(zoo_freq_mens_cinema_0024)
+
+
+
+#--- 3.3.2. Visualiser les séries temporelles
 
 plot(ts_freq_mens_cinema / 1e6,
      xlab = "Temps",
@@ -166,9 +178,9 @@ plot(ts_freq_mens_cinema_0024 / 1e6,
 
 
 
-#--- 2.4.3. Décomposer les séries temporelles ---
+#----- 3.4. Détecter la saisonnalité -----
 
-# 1980 - 2024
+#--- 3.4.1. 1980 - 2024 ---
 
 ts_freq_mens_cinema |> 
   as.ts() |> 
@@ -183,7 +195,8 @@ ts_freq_mens_cinema |>
 ## Multiplicatif est plus adapté
 
 
-# 2000 - 2024
+
+#--- 3.4.2. 2000 - 2024 ---
 
 ts_freq_mens_cinema_0024 |> 
   as.ts() |> 
@@ -196,3 +209,27 @@ ts_freq_mens_cinema_0024 |>
   plot()
 
 ## Multiplicatif est plus adapté
+
+
+
+
+
+#---------- 4. DÉSAISONNALISATION ET DÉCOMPOSITION ----------
+
+# # Appliquer X13-ARIMA-SEATS sur la série corrigée
+# x13_result <- seas(ts_freq_mens_cinema_0024)
+# 
+# # Afficher un résumé du modèle
+# summary(x13_result)
+# 
+# # Graphique de la décomposition
+# plot(x13_result)
+# 
+# # Extraire la série désaisonnalisée
+# serie_desaisson <- final(x13_result)
+# 
+# # Afficher la série désaisonnalisée
+# plot(serie_desaisson, main = "Série Désaisonnalisée", col = "blue", lwd = 2)
+# 
+# # Retourner les données désaisonnalisées
+# serie_desaisson
