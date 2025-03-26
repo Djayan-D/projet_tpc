@@ -6,6 +6,8 @@ library(ggplot2)
 library(dplyr)
 library(tidyr)
 library(EnvStats)
+library(moments)
+library(tibble) 
 
 
 
@@ -64,9 +66,54 @@ freq_mens_cinema_0024_long$Date <- as.yearmon(paste(freq_mens_cinema_0024_long$A
 
 
 
-#----- 2.3. Vérifier les valeurs atypiques -----
+#----- 2.3. Analyse des données -----
 
-#--- 2.3.1. Boxplots ---
+#--- 2.3.1. Statistiques descriptives. ---
+
+# Créer une fonction
+
+stats_desc <- function(data) {
+  # Calcul des statistiques de base
+  moyenne <- mean(data, na.rm = TRUE)
+  ecart_type <- sd(data, na.rm = TRUE)
+  asymetrie <- skewness(data, na.rm = TRUE)
+  aplatissement <- kurtosis(data, na.rm = TRUE)
+  shapiro_test <- shapiro.test(data)$p.value  # Test de normalité (Shapiro-Wilk)
+  
+  # Calcul des quantiles
+  quantiles <- quantile(data, probs = c(0, 0.25, 0.5, 0.75, 1), na.rm = TRUE)
+  
+  # Création d'un tableau de résultats
+  resultats <- tibble(
+    Statistique = c("Moyenne", "Écart-type", "Skewness", "Kurtosis", 
+                    "p-value Shapiro-Wilk", "Min", "1er Quartile (Q1)", 
+                    "Médiane (Q2)", "3e Quartile (Q3)", "Max"),
+    Valeur = c(moyenne, ecart_type, asymetrie, aplatissement, shapiro_test, 
+               quantiles[1], quantiles[2], quantiles[3], quantiles[4], quantiles[5])
+  )
+  
+  return(resultats)
+}
+
+
+
+# Appliquer à la série 1980-2024
+
+stats_desc(freq_mens_cinema_long$Valeur)
+
+
+
+# Appliquer à la série 2000-2024
+
+stats_desc(freq_mens_cinema_0024_long$Valeur)
+
+
+
+#--- 2.3.2. Vérifier les valeurs atypiques ---
+
+#- 2.3.2.1. Boxplots -
+
+# Boxplots
 
 boxplot(freq_mens_cinema_long$Valeur,
         main = "Boxplot 1980-2024")
@@ -81,7 +128,7 @@ boxplot(freq_mens_cinema_0024_long$Valeur,
 
 
 
-#--- 2.3.2. Rosner Test ---
+#- 2.3.2.2. Rsoner Test -
 
 rosnerTest(freq_mens_cinema_long$Valeur,
            k = 3)
@@ -93,7 +140,6 @@ rosnerTest(freq_mens_cinema_0024_long$Valeur,
            k = 4)
 
 ## Aucune valeur réellement atypique, pas besoin de modifier la base.
-
 
 
 #----- 2.4. Convertir en TS -----
@@ -135,6 +181,7 @@ ts_freq_mens_cinema |>
   plot()
 
 ## Multiplicatif est plus adapté
+
 
 # 2000 - 2024
 
