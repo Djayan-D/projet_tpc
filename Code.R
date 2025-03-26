@@ -122,12 +122,30 @@ plot(ts_freq_mens_cinema_0024 / 1e6,
 
 #--- 2.4.3. Décomposer les séries temporelles ---
 
+# 1980 - 2024
+
 ts_freq_mens_cinema |> 
   as.ts() |> 
-  decompose() |> 
+  decompose(, type = "additive") |> 
+  plot()
+
+ts_freq_mens_cinema |> 
+  as.ts() |> 
+  decompose(, type = "multiplicative") |> 
+  plot()
+
+## Multiplicatif est plus adapté
+
+# 2000 - 2024
+
+ts_freq_mens_cinema_0024 |> 
+  as.ts() |> 
+  decompose(, type = "additive") |> 
   plot()
 
 ts_freq_mens_cinema_0024 |> 
   as.ts() |> 
-  decompose() |> 
+  decompose(, type = "multiplicative") |> 
   plot()
+
+## Multiplicatif est plus adapté
