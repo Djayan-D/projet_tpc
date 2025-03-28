@@ -147,6 +147,25 @@ rosnerTest(freq_mens_cinema_0020_long$Valeur,
 freq_mens_cinema_0020_long |>
   slice_max(Valeur, n = 3)
 
+# Mars 2008 (27 056 406 entrées)
+#
+# Le phénomène "Bienvenue chez les Ch’tis", sorti le 27 février 2008, a explosé 
+# tous les records en France. Ce film de Dany Boon est rapidement devenu le plus 
+# gros succès du box-office français (jusqu'à l'arrivée d'"Intouchables" en 2011).
+# 
+# Novembre 2011 (26 557 171 entrées)
+# 
+# La sortie d’"Intouchables" le 2 novembre 2011 a généré un engouement énorme. 
+# Ce film avec Omar Sy et François Cluzet est devenu l’un des films français les 
+# plus vus de tous les temps.
+# 
+# Février 2016 (26 017 394 entrées)
+# 
+# Plusieurs succès ont contribué à ce chiffre, notamment "Les Tuche 2 : Le rêve 
+# américain" (sorti le 3 février) et "Deadpool" (sorti le 10 février).
+# 
+# La période des vacances scolaires en février booste également les entrées au cinéma.
+
 
 #----- 3.3. Convertir et visualiser les TS -----
 
