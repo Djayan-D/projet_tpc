@@ -221,20 +221,39 @@ summary(regarima_x13(ts_freq_mens_cinema, spec ="RG5c"))
 
 #---------- 4. DÉSAISONNALISATION ET DÉCOMPOSITION ----------
 
-# # Appliquer X13-ARIMA-SEATS sur la série corrigée
-# x13_result <- seas(ts_freq_mens_cinema_0020)
-# 
-# # Afficher un résumé du modèle
-# summary(x13_result)
-# 
-# # Graphique de la décomposition
-# plot(x13_result)
-# 
-# # Extraire la série désaisonnalisée
-# serie_desaisson <- final(x13_result)
-# 
-# # Afficher la série désaisonnalisée
-# plot(serie_desaisson, main = "Série Désaisonnalisée", col = "blue", lwd = 2)
-# 
-# # Retourner les données désaisonnalisées
-# serie_desaisson
+# Appliquer X13-ARIMA-SEATS sur la série corrigée
+x13_result <- seas(ts_freq_mens_cinema_0020)
+
+# Afficher un résumé du modèle
+summary(x13_result)
+
+# Graphique de la décomposition
+plot(x13_result)
+
+# Extraire la série désaisonnalisée
+serie_desaisson <- final(x13_result)
+
+# Afficher la série désaisonnalisée
+plot(serie_desaisson, main = "Série Désaisonnalisée", col = "blue", lwd = 2)
+
+# Retourner les données désaisonnalisées
+serie_desaisson
+
+# Lissage exponentiel
+
+# Méthode LED tiens compte de la tendance mais pas de la saisonnalité
+
+serie_desaisson_LED <- HoltWinters(serie_desaisson,gamma=FALSE) 
+
+show(serie_desaisson_LED)
+plot(serie_desaisson_LED)
+plot(serie_desaisson_LED$fitted[,1])
+
+
+
+
+
+
+
+
+
