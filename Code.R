@@ -10,6 +10,7 @@ library(moments)
 library(tibble)
 library(seasonal)
 library(RJDemetra)
+library(forecast)
 
 
 
@@ -292,6 +293,45 @@ plot(serie_desaisson_LED$fitted[,1])
 
 ## La composante de tendance montre une augmentation générale au fil du temps,
 # avec des fluctuations bien visibles autour de la tendance.
+
+
+#-- 5. Prévision de la série saisonnière corrigée des points atypiques sur une année ----------
+
+## Estimer et prévoir les modèles suivants :
+
+### Forecasting with h number of periods for forecasting with StructTS
+
+fitsts = StructTS(ts_freq_mens_cinema_0020)
+prevsts <- forecast(fitsts,12)
+show(prevsts) # pas mettre en annexe
+plot(prevsts) # en annexe
+
+### Forecasting with h number of periods for forecasting with stlm
+
+fitstl = stlm(ts_freq_mens_cinema_0020)
+prevstl <- forecast(fitstl,12)
+show(prevstl)
+plot(prevstl)
+
+### Forecasting with X13
+
+# prevX13 = predict(ts_freq_mens_cinema_0020, 12, prediction.interval = TRUE) # on spécifie les intervalles de confiance
+# plot(ts_freq_mens_cinema_0020, prevX13)
+# show(prevX13)
+# prevp = prevX13[1]
+# show(prevp)
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
