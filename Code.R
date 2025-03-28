@@ -9,6 +9,7 @@ library(EnvStats)
 library(moments)
 library(tibble)
 library(seasonal)
+library(RJDemetra)
 
 
 
@@ -147,6 +148,25 @@ rosnerTest(freq_mens_cinema_0020_long$Valeur,
 freq_mens_cinema_0020_long |>
   slice_max(Valeur, n = 3)
 
+# Mars 2008 (27 056 406 entrées)
+#
+# Le phénomène "Bienvenue chez les Ch’tis", sorti le 27 février 2008, a explosé 
+# tous les records en France. Ce film de Dany Boon est rapidement devenu le plus 
+# gros succès du box-office français (jusqu'à l'arrivée d'"Intouchables" en 2011).
+# 
+# Novembre 2011 (26 557 171 entrées)
+# 
+# La sortie d’"Intouchables" le 2 novembre 2011 a généré un engouement énorme. 
+# Ce film avec Omar Sy et François Cluzet est devenu l’un des films français les 
+# plus vus de tous les temps.
+# 
+# Février 2016 (26 017 394 entrées)
+# 
+# Plusieurs succès ont contribué à ce chiffre, notamment "Les Tuche 2 : Le rêve 
+# américain" (sorti le 3 février) et "Deadpool" (sorti le 10 février).
+# 
+# La période des vacances scolaires en février booste également les entrées au cinéma.
+
 
 #----- 3.3. Convertir et visualiser les TS -----
 
@@ -182,7 +202,9 @@ plot(ts_freq_mens_cinema_0020 / 1e6,
 
 #----- 3.4. Détecter la saisonnalité -----
 
-#--- 3.4.1. 1980 - 2020 ---
+#--- 3.4.1. 1980 - 2024 ---
+
+# Graphiques
 
 ts_freq_mens_cinema |> 
   as.ts() |> 
@@ -194,12 +216,19 @@ ts_freq_mens_cinema |>
   decompose(, type = "multiplicative") |> 
   plot()
 
-## Multiplicatif est plus adapté
+
+# Test
+
+summary(regarima_x13(ts_freq_mens_cinema_0020, spec ="RG5c"))
+
+## Additif est plus adapté
 
 
 
 #--- 3.4.2. 2000 - 2020 ---
 
+# Graphiques
+
 ts_freq_mens_cinema_0020 |> 
   as.ts() |> 
   decompose(, type = "additive") |> 
@@ -210,12 +239,14 @@ ts_freq_mens_cinema_0020 |>
   decompose(, type = "multiplicative") |> 
   plot()
 
+
+# Test
+
+summary(regarima_x13(ts_freq_mens_cinema_0020, spec ="RG5c"))
+
 ## Multiplicatif est plus adapté
 
 
-library(RJDemetra)
-
-summary(regarima_x13(ts_freq_mens_cinema, spec ="RG5c"))
 
 
 
