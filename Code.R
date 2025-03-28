@@ -9,6 +9,7 @@ library(EnvStats)
 library(moments)
 library(tibble)
 library(seasonal)
+library(RJDemetra)
 
 
 
@@ -201,7 +202,9 @@ plot(ts_freq_mens_cinema_0020 / 1e6,
 
 #----- 3.4. Détecter la saisonnalité -----
 
-#--- 3.4.1. 1980 - 2020 ---
+#--- 3.4.1. 1980 - 2024 ---
+
+# Graphiques
 
 ts_freq_mens_cinema |> 
   as.ts() |> 
@@ -213,12 +216,19 @@ ts_freq_mens_cinema |>
   decompose(, type = "multiplicative") |> 
   plot()
 
-## Multiplicatif est plus adapté
+
+# Test
+
+summary(regarima_x13(ts_freq_mens_cinema_0020, spec ="RG5c"))
+
+## Additif est plus adapté
 
 
 
 #--- 3.4.2. 2000 - 2020 ---
 
+# Graphiques
+
 ts_freq_mens_cinema_0020 |> 
   as.ts() |> 
   decompose(, type = "additive") |> 
@@ -229,12 +239,14 @@ ts_freq_mens_cinema_0020 |>
   decompose(, type = "multiplicative") |> 
   plot()
 
+
+# Test
+
+summary(regarima_x13(ts_freq_mens_cinema_0020, spec ="RG5c"))
+
 ## Multiplicatif est plus adapté
 
 
-library(RJDemetra)
-
-summary(regarima_x13(ts_freq_mens_cinema, spec ="RG5c"))
 
 
 
