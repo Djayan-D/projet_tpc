@@ -40,10 +40,10 @@ freq_mens_cinema <- freq_mens_cinema |>
 
 
 
-#--- 2.2.3. Extraire la période 2000-2024 ---
+#--- 2.2.3. Extraire la période 2000-2020 ---
 
-freq_mens_cinema_0024 <- freq_mens_cinema |> 
-  filter(Annee >= 2000)
+freq_mens_cinema_0020 <- freq_mens_cinema |> 
+  filter(Annee >= 2000 & Annee < 2020)
 
 
 
@@ -52,7 +52,7 @@ freq_mens_cinema_0024 <- freq_mens_cinema |>
 freq_mens_cinema_long <- freq_mens_cinema |> 
   pivot_longer(cols = -Annee, names_to = "Mois", values_to = "Valeur")
 
-freq_mens_cinema_0024_long <- freq_mens_cinema_0024 |> 
+freq_mens_cinema_0020_long <- freq_mens_cinema_0020 |> 
   pivot_longer(cols = -Annee, names_to = "Mois", values_to = "Valeur")
 
 
@@ -62,7 +62,7 @@ freq_mens_cinema_0024_long <- freq_mens_cinema_0024 |>
 freq_mens_cinema_long$Date <- as.yearmon(paste(freq_mens_cinema_long$Annee, freq_mens_cinema_long$Mois), 
                                          format = "%Y %B")
 
-freq_mens_cinema_0024_long$Date <- as.yearmon(paste(freq_mens_cinema_0024_long$Annee, freq_mens_cinema_0024_long$Mois),
+freq_mens_cinema_0020_long$Date <- as.yearmon(paste(freq_mens_cinema_0020_long$Annee, freq_mens_cinema_0020_long$Mois),
                                               format = "%Y %B")
 
 
@@ -104,9 +104,9 @@ stats_desc(freq_mens_cinema_long$Valeur)
 
 
 
-#--- 3.1.3. Appliquer à la série 2000-2024 ---
+#--- 3.1.3. Appliquer à la série 2000-2020 ---
 
-stats_desc(freq_mens_cinema_0024_long$Valeur)
+stats_desc(freq_mens_cinema_0020_long$Valeur)
 
 
 
@@ -122,10 +122,10 @@ boxplot(freq_mens_cinema_long$Valeur,
 ## 3 valeurs potentiellement atypiques.
 
 
-boxplot(freq_mens_cinema_0024_long$Valeur,
-        main = "Boxplot 1980-2024")
+boxplot(freq_mens_cinema_0020_long$Valeur,
+        main = "Boxplot 2000-2020")
 
-## 4 valeurs potentiellement atypiques.
+## 3 valeurs potentiellement atypiques.
 
 
 
@@ -138,12 +138,14 @@ rosnerTest(freq_mens_cinema_long$Valeur,
 ## Les stats descriptives n'ont pas besoin d'être recalculées.
 
 
-rosnerTest(freq_mens_cinema_0024_long$Valeur,
-           k = 4)
+rosnerTest(freq_mens_cinema_0020_long$Valeur,
+           k = 3)
 
 ## Aucune valeur réellement atypique, pas besoin de modifier la base.
 ## Les stats descriptives n'ont pas besoin d'être recalculées.
 
+freq_mens_cinema_0020_long |>
+  slice_max(Valeur, n = 3)
 
 
 #----- 3.3. Convertir et visualiser les TS -----
@@ -154,13 +156,13 @@ rosnerTest(freq_mens_cinema_0024_long$Valeur,
 
 zoo_freq_mens_cinema <- zoo(freq_mens_cinema_long$Valeur, order.by = freq_mens_cinema_long$Date)
 
-zoo_freq_mens_cinema_0024 <- zoo(freq_mens_cinema_0024_long$Valeur, order.by = freq_mens_cinema_0024_long$Date)
+zoo_freq_mens_cinema_0020 <- zoo(freq_mens_cinema_0020_long$Valeur, order.by = freq_mens_cinema_0020_long$Date)
 
 # TS
 
 ts_freq_mens_cinema <- as.ts(zoo_freq_mens_cinema)
 
-ts_freq_mens_cinema_0024 <- as.ts(zoo_freq_mens_cinema_0024)
+ts_freq_mens_cinema_0020 <- as.ts(zoo_freq_mens_cinema_0020)
 
 
 
@@ -171,16 +173,16 @@ plot(ts_freq_mens_cinema / 1e6,
      ylab = "Nombre d'entrées (en millions)",
      main = "Série temporelle des valeurs mensuelles 1980-2024")
 
-plot(ts_freq_mens_cinema_0024 / 1e6,
+plot(ts_freq_mens_cinema_0020 / 1e6,
      xlab = "Temps",
      ylab = "Nombre d'entrées (en millions)",
-     main = "Série temporelle des valeurs mensuelles 2000-2024")
+     main = "Série temporelle des valeurs mensuelles 2000-2020")
 
 
 
 #----- 3.4. Détecter la saisonnalité -----
 
-#--- 3.4.1. 1980 - 2024 ---
+#--- 3.4.1. 1980 - 2020 ---
 
 ts_freq_mens_cinema |> 
   as.ts() |> 
@@ -196,14 +198,14 @@ ts_freq_mens_cinema |>
 
 
 
-#--- 3.4.2. 2000 - 2024 ---
+#--- 3.4.2. 2000 - 2020 ---
 
-ts_freq_mens_cinema_0024 |> 
+ts_freq_mens_cinema_0020 |> 
   as.ts() |> 
   decompose(, type = "additive") |> 
   plot()
 
-ts_freq_mens_cinema_0024 |> 
+ts_freq_mens_cinema_0020 |> 
   as.ts() |> 
   decompose(, type = "multiplicative") |> 
   plot()
@@ -211,13 +213,16 @@ ts_freq_mens_cinema_0024 |>
 ## Multiplicatif est plus adapté
 
 
+library(RJDemetra)
+
+summary(regarima_x13(ts_freq_mens_cinema, spec ="RG5c"))
 
 
 
 #---------- 4. DÉSAISONNALISATION ET DÉCOMPOSITION ----------
 
 # # Appliquer X13-ARIMA-SEATS sur la série corrigée
-# x13_result <- seas(ts_freq_mens_cinema_0024)
+# x13_result <- seas(ts_freq_mens_cinema_0020)
 # 
 # # Afficher un résumé du modèle
 # summary(x13_result)
