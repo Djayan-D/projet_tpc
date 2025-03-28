@@ -280,10 +280,18 @@ show(serie_desaisson_LED)
 plot(serie_desaisson_LED)
 plot(serie_desaisson_LED$fitted[,1])
 
+# Smoothing parameters:
+# alpha: 0.3460451
+# beta : 0.09966349
+# gamma: FALSE
 
+# Indique un lissage modéré des valeurs récentes.
+# Une valeur plus proche de 1 donnerait plus de poids aux observations récentes.
 
+# Une faible valeur de Beta signifie que la tendance évolue lentement.
 
-
+## La composante de tendance montre une augmentation générale au fil du temps,
+# avec des fluctuations bien visibles autour de la tendance.
 
 
 
