@@ -82,6 +82,7 @@ ts_freq_mens_cinema <- ts(freq_mens_cinema_long$Valeur,
                           start = c(1980, 1), 
                           frequency = 12)
 
+
 # 2000 - 2020
 
 ts_freq_mens_cinema_0020 <- ts(freq_mens_cinema_0020_long$Valeur, 
@@ -91,28 +92,68 @@ ts_freq_mens_cinema_0020 <- ts(freq_mens_cinema_0020_long$Valeur,
 
 #--- 3.1.2. Identifier les valeurs atypiques ---
 
-outliers <- tso(ts_freq_mens_cinema_0020) 
-print(outliers)
+# 1980 - 2024
 
-plot(outliers)
-show(outliers)
+outliers_8024 <- tso(ts_freq_mens_cinema) 
+print(outliers_8024)
+
+plot(outliers_8024)
+show(outliers_8024)
+
+# Pour justifier pourquoi on coupe
+
+
+# 2000 - 2020
+
+outliers_0020 <- tso(ts_freq_mens_cinema_0020) 
+print(outliers_0020)
+
+plot(outliers_0020)
+show(outliers_0020)
+
+window(ts_freq_mens_cinema_0020, start = c(2008, 3), end = c(2008, 3))
 
 # Mars 2008 (27 056 406 entrées)
 #
-# Le phénomène "Bienvenue chez les Ch’tis", sorti le 27 février 2008, a explosé 
-# tous les records en France. Ce film de Dany Boon est rapidement devenu le plus 
-# gros succès du box-office français (jusqu'à l'arrivée d'"Intouchables" en 2011).
+# En mars 2008, un outlier additive (AO) a été détecté dans la fréquentation 
+# mensuelle des cinémas, avec une anomalie estimée à 9,8 millions d’entrées 
+# supplémentaires.
+# Un AO (outlier additif) est une valeur aberrante isolée qui perturbe 
+# temporairement une série temporelle, sans affecter les périodes suivantes. 
+# Il s'agit d'une fluctuation ponctuelle et inhabituelle qui ne modifie pas la 
+# tendance globale.
+# Dans ce cas précis, l’AO de mars 2008 est directement lié au phénomène 
+# "Bienvenue chez les Ch’tis", sorti le 27 février 2008. Ce film de Dany Boon 
+# a provoqué un afflux exceptionnel de spectateurs, générant une hausse soudaine 
+# des entrées en salle. Cet événement a marqué un record historique du box-office 
+# français, qui ne sera dépassé qu’en 2011 avec la sortie du film "Intouchables".
 
 
 
 #--- 3.1.3. Traiter les valeurs atypiques ---
 
-ts_freq_mens_cinema_0020_corr <- outliers$yadj
+# 1980 - 2024
+
+ts_freq_mens_cinema_corr <- outliers_8024$yadj
+
+
+# 2000 - 2020
+
+ts_freq_mens_cinema_0020_corr <- outliers_0020$yadj
 
 
 
 #--- 3.1.4. Visualiser la TS corrigée ---
 
+# 1980 - 2024
+
+plot(ts_freq_mens_cinema_corr / 1e6,
+     xlab = "Temps",
+     ylab = "Nombre d'entrées (en millions)",
+     main = "Série temporelle des valeurs mensuelles 1980-2024")
+
+
+# 2000 - 2020
 
 plot(ts_freq_mens_cinema_0020_corr / 1e6,
      xlab = "Temps",
@@ -150,15 +191,39 @@ stats_desc <- function(data) {
 
 
 
-#--- 3.2.2. Appliquer à la série 1980-2024 ---
+#--- 3.2.2. Appliquer à la série ---
 
-stats_desc(freq_mens_cinema_long$Valeur)
+# 1980 - 2024
+
+ts_freq_mens_cinema_corr |> 
+  as.numeric() |> 
+  stats_desc()
+
+
+# 2000 - 2020
+
+ts_freq_mens_cinema_0020_corr |> 
+  as.numeric() |> 
+  stats_desc()
 
 
 
-#--- 3.2.3. Appliquer à la série 2000-2020 ---
+#--- 3.2.3. Boxplot ---
 
-stats_desc(freq_mens_cinema_0020_long$Valeur)
+# 1980 - 2024
+
+ts_freq_mens_cinema_corr |> 
+  as.numeric() |> 
+  boxplot()
+
+
+# 2000 - 2020
+
+ts_freq_mens_cinema_0020_corr |> 
+  as.numeric() |> 
+  boxplot()
+
+# Juste dire que la série est plutôt propre
 
 
 
