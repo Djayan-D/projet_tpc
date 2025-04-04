@@ -174,7 +174,7 @@ summary(regarima_x13(ts_freq_mens_cinema_0020_corr, spec ="RG5c"))
 #---------- 4. DÉSAISONNALISATION ET DÉCOMPOSITION ----------
 
 # Appliquer X13-ARIMA-SEATS sur la série corrigée
-x13_result <- seas(ts_freq_mens_cinema_0020)
+x13_result <- seas(ts_freq_mens_cinema_0020_corr)
 
 # Afficher un résumé du modèle
 summary(x13_result)
@@ -201,22 +201,22 @@ serie_desaisson
 
 ####  StructTS ----
 
-fitsts = StructTS(ts_freq_mens_cinema_0020)
+fitsts = StructTS(ts_freq_mens_cinema_0020_corr)
 prevsts <- forecast(fitsts,12) #période d'une année
 show(prevsts) # pas mettre en annexe
 plot(prevsts) # en annexe
 
 #### stlm ----
 
-fitstl = stlm(ts_freq_mens_cinema_0020)
+fitstl = stlm(ts_freq_mens_cinema_0020_corr)
 prevstl <- forecast(fitstl,12)
 show(prevstl)
 plot(prevstl)
 
 #### X13 ----
 
-# prevX13 = predict(ts_freq_mens_cinema_0020, 12, prediction.interval = TRUE) # on spécifie les intervalles de confiance
-# plot(ts_freq_mens_cinema_0020, prevX13)
+# prevX13 = predict(ts_freq_mens_cinema_0020_corr, 12, prediction.interval = TRUE) # on spécifie les intervalles de confiance
+# plot(ts_freq_mens_cinema_0020_corr, prevX13)
 # show(prevX13)
 # prevp = prevX13[1]
 # show(prevp)
@@ -225,7 +225,7 @@ plot(prevstl)
 
 #### Holt-winters ----
 
-WH_add<- HoltWinters(ts_freq_mens_cinema_0020,seasonal="add") # je spécifie schéma additif
+WH_add<- HoltWinters(ts_freq_mens_cinema_0020_corr,seasonal="add") # je spécifie schéma additif
 # on à ici une tendance et une saisonnalité
 show(WH_add)
 plot(WH_add)
@@ -243,6 +243,7 @@ show(prevf_hw)
 
 
 
+fit_ets <- ets(ts_freq_mens_cinema_0020_corr)
 
 
 
