@@ -72,9 +72,58 @@ freq_mens_cinema_0020_long$Date <- as.yearmon(paste(freq_mens_cinema_0020_long$A
 
 #---------- 3. ANALYSE DES DONNÉES ----------
 
-#----- 3.1. Statistiques descriptives -----
+#----- 3.1. Vérifier les valeurs atypiques -----
 
-#--- 3.1.1. Créer une fonction ---
+#--- 3.1.1. Convertir en TS ---
+
+# 1980 - 2024
+
+ts_freq_mens_cinema <- ts(freq_mens_cinema_long$Valeur, 
+                          start = c(1980, 1), 
+                          frequency = 12)
+
+# 2000 - 2020
+
+ts_freq_mens_cinema_0020 <- ts(freq_mens_cinema_0020_long$Valeur, 
+                               start = c(2000, 1), 
+                               frequency = 12)
+
+
+#--- 3.1.2. Identifier les valeurs atypiques ---
+
+outliers <- tso(ts_freq_mens_cinema_0020) 
+print(outliers)
+
+plot(outliers)
+show(outliers)
+
+# Mars 2008 (27 056 406 entrées)
+#
+# Le phénomène "Bienvenue chez les Ch’tis", sorti le 27 février 2008, a explosé 
+# tous les records en France. Ce film de Dany Boon est rapidement devenu le plus 
+# gros succès du box-office français (jusqu'à l'arrivée d'"Intouchables" en 2011).
+
+
+
+#--- 3.1.3. Traiter les valeurs atypiques ---
+
+ts_freq_mens_cinema_0020_corr <- outliers$yadj
+
+
+
+#--- 3.1.4. Visualiser la TS corrigée ---
+
+
+plot(ts_freq_mens_cinema_0020_corr / 1e6,
+     xlab = "Temps",
+     ylab = "Nombre d'entrées (en millions)",
+     main = "Série temporelle des valeurs mensuelles 2000-2020")
+
+
+
+#----- 3.2. Statistiques descriptives -----
+
+#--- 3.2.1. Créer une fonction ---
 
 stats_desc <- function(data) {
   # Calcul des statistiques de base
@@ -101,63 +150,27 @@ stats_desc <- function(data) {
 
 
 
-#--- 3.1.2. Appliquer à la série 1980-2024 ---
+#--- 3.2.2. Appliquer à la série 1980-2024 ---
 
 stats_desc(freq_mens_cinema_long$Valeur)
 
 
 
-#--- 3.1.3. Appliquer à la série 2000-2020 ---
+#--- 3.2.3. Appliquer à la série 2000-2020 ---
 
 stats_desc(freq_mens_cinema_0020_long$Valeur)
 
 
 
-#----- 3.2. Vérifier les valeurs atypiques -----
+#----- 3.3. Détecter la saisonnalité -----
 
-#--- 3.2.1. Identifier les valeurs atypiques ---
-
-outliers <- tso(ts_freq_mens_cinema_0020) 
-print(outliers)
-
-plot(outliers)
-show(outliers)
-
-# Mars 2008 (27 056 406 entrées)
-#
-# Le phénomène "Bienvenue chez les Ch’tis", sorti le 27 février 2008, a explosé 
-# tous les records en France. Ce film de Dany Boon est rapidement devenu le plus 
-# gros succès du box-office français (jusqu'à l'arrivée d'"Intouchables" en 2011).
-
-
-
-#--- 3.2.2. Traiter les valeurs atypiques ---
-
-ts_freq_mens_cinema_0020_corr <- outliers$yadj
-
-
-
-#--- 3.2.3. Visualiser la TS corrigée ---
-
-
-plot(ts_freq_mens_cinema_0020_corr / 1e6,
-     xlab = "Temps",
-     ylab = "Nombre d'entrées (en millions)",
-     main = "Série temporelle des valeurs mensuelles 2000-2020")
-
-
-
-#----- 3.4. Détecter la saisonnalité -----
-
-#--- 3.4.1. Graphiques ---
+#--- 3.3.1. Graphiques ---
 
 ts_freq_mens_cinema_0020_corr |> 
-  as.ts() |> 
   decompose(, type = "additive") |> 
   plot()
 
 ts_freq_mens_cinema_0020_corr |> 
-  as.ts() |> 
   decompose(, type = "multiplicative") |> 
   plot()
 
