@@ -114,87 +114,32 @@ stats_desc(freq_mens_cinema_0020_long$Valeur)
 
 #----- 3.2. Vérifier les valeurs atypiques -----
 
-#--- 3.2.1. Boxplots ---
+#--- 3.2.1. Identifier les valeurs atypiques ---
 
-# Boxplots
+outliers <- tso(ts_freq_mens_cinema_0020) 
+print(outliers)
 
-boxplot(freq_mens_cinema_long$Valeur,
-        main = "Boxplot 1980-2024")
-
-## 3 valeurs potentiellement atypiques.
-
-
-boxplot(freq_mens_cinema_0020_long$Valeur,
-        main = "Boxplot 2000-2020")
-
-## 3 valeurs potentiellement atypiques.
-
-
-
-#--- 3.2.2. Rosner Test ---
-
-rosnerTest(freq_mens_cinema_long$Valeur,
-           k = 3)
-
-## Aucune valeur réellement atypique, pas besoin de modifier la base.
-## Les stats descriptives n'ont pas besoin d'être recalculées.
-
-
-rosnerTest(freq_mens_cinema_0020_long$Valeur,
-           k = 3)
-
-## Aucune valeur réellement atypique, pas besoin de modifier la base.
-## Les stats descriptives n'ont pas besoin d'être recalculées.
-
-freq_mens_cinema_0020_long |>
-  slice_max(Valeur, n = 3)
+plot(outliers)
+show(outliers)
 
 # Mars 2008 (27 056 406 entrées)
 #
 # Le phénomène "Bienvenue chez les Ch’tis", sorti le 27 février 2008, a explosé 
 # tous les records en France. Ce film de Dany Boon est rapidement devenu le plus 
 # gros succès du box-office français (jusqu'à l'arrivée d'"Intouchables" en 2011).
-# 
-# Novembre 2011 (26 557 171 entrées)
-# 
-# La sortie d’"Intouchables" le 2 novembre 2011 a généré un engouement énorme. 
-# Ce film avec Omar Sy et François Cluzet est devenu l’un des films français les 
-# plus vus de tous les temps.
-# 
-# Février 2016 (26 017 394 entrées)
-# 
-# Plusieurs succès ont contribué à ce chiffre, notamment "Les Tuche 2 : Le rêve 
-# américain" (sorti le 3 février) et "Deadpool" (sorti le 10 février).
-# 
-# La période des vacances scolaires en février booste également les entrées au cinéma.
-
-
-#----- 3.3. Convertir et visualiser les TS -----
-
-#--- 3.3.1. Convertir en ZOO et en TS ---
-
-# ZOO
-
-zoo_freq_mens_cinema <- zoo(freq_mens_cinema_long$Valeur, order.by = freq_mens_cinema_long$Date)
-
-zoo_freq_mens_cinema_0020 <- zoo(freq_mens_cinema_0020_long$Valeur, order.by = freq_mens_cinema_0020_long$Date)
-
-# TS
-
-ts_freq_mens_cinema <- as.ts(zoo_freq_mens_cinema)
-
-ts_freq_mens_cinema_0020 <- as.ts(zoo_freq_mens_cinema_0020)
 
 
 
-#--- 3.3.2. Visualiser les séries temporelles
+#--- 3.2.2. Traiter les valeurs atypiques ---
 
-plot(ts_freq_mens_cinema / 1e6,
-     xlab = "Temps",
-     ylab = "Nombre d'entrées (en millions)",
-     main = "Série temporelle des valeurs mensuelles 1980-2024")
+ts_freq_mens_cinema_0020_corr <- outliers$yadj
 
-plot(ts_freq_mens_cinema_0020 / 1e6,
+
+
+#--- 3.2.3. Visualiser la TS corrigée ---
+
+
+plot(ts_freq_mens_cinema_0020_corr / 1e6,
      xlab = "Temps",
      ylab = "Nombre d'entrées (en millions)",
      main = "Série temporelle des valeurs mensuelles 2000-2020")
@@ -203,16 +148,14 @@ plot(ts_freq_mens_cinema_0020 / 1e6,
 
 #----- 3.4. Détecter la saisonnalité -----
 
-#--- 3.4.1. 1980 - 2024 ---
+#--- 3.4.1. Graphiques ---
 
-# Graphiques
-
-ts_freq_mens_cinema |> 
+ts_freq_mens_cinema_0020_corr |> 
   as.ts() |> 
   decompose(, type = "additive") |> 
   plot()
 
-ts_freq_mens_cinema |> 
+ts_freq_mens_cinema_0020_corr |> 
   as.ts() |> 
   decompose(, type = "multiplicative") |> 
   plot()
@@ -220,30 +163,7 @@ ts_freq_mens_cinema |>
 
 # Test
 
-summary(regarima_x13(ts_freq_mens_cinema_0020, spec ="RG5c"))
-
-## Additif est plus adapté
-
-
-
-#--- 3.4.2. 2000 - 2020 ---
-
-# Graphiques
-
-ts_freq_mens_cinema_0020 |> 
-  as.ts() |> 
-  decompose(, type = "additive") |> 
-  plot()
-
-ts_freq_mens_cinema_0020 |> 
-  as.ts() |> 
-  decompose(, type = "multiplicative") |> 
-  plot()
-
-
-# Test
-
-summary(regarima_x13(ts_freq_mens_cinema_0020, spec ="RG5c"))
+summary(regarima_x13(ts_freq_mens_cinema_0020_corr, spec ="RG5c"))
 
 ## Multiplicatif est plus adapté
 
