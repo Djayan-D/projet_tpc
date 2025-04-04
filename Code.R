@@ -11,6 +11,7 @@ library(tibble)
 library(seasonal)
 library(RJDemetra)
 library(forecast)
+library(tsoutliers)
 
 
 
@@ -241,13 +242,11 @@ show(prevf_hw)
 
 #### ETS ----
 
-
-
 fit_ets <- ets(ts_freq_mens_cinema_0020_corr)
+show(fit_ets)
+plot(fit_ets)
 
-
-
-
+prev_ETS
 
 
 
