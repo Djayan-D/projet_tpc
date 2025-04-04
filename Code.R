@@ -12,6 +12,7 @@ library(seasonal)
 library(RJDemetra)
 library(forecast)
 library(tsoutliers)
+library(smooth)
 
 
 
@@ -146,7 +147,6 @@ plot(ts_freq_mens_cinema_0020_corr / 1e6,
      main = "Série temporelle des valeurs mensuelles 2000-2020")
 
 
-
 #----- 3.4. Détecter la saisonnalité -----
 
 #--- 3.4.1. Graphiques ---
@@ -227,7 +227,7 @@ plot(prevstl)
 #### Holt-winters ----
 
 WH_add<- HoltWinters(ts_freq_mens_cinema_0020_corr,seasonal="add") # je spécifie schéma additif
-# on à ici une tendance et une saisonnalité
+# on a ici une tendance et une saisonnalité
 show(WH_add)
 plot(WH_add)
 plot(WH_add$fitted[,1])
@@ -246,7 +246,48 @@ fit_ets <- ets(ts_freq_mens_cinema_0020_corr)
 show(fit_ets)
 plot(fit_ets)
 
-prev_ETS
+prev_ETS <- forecast(fit_ets, h=12)
+plot(prev_ETS)
+
+#### TBATS ----
+
+fit_tbats <- tbats(ts_freq_mens_cinema_0020_corr)
+show(fit_tbats)
+plot(fit_tbats)
+
+prev_TBATS <- forecast(fit_tbats, h=12)
+plot(prev_TBATS)
+
+#### ADAM ETS ----
+
+fit_ADAM_ETS <- auto.adam(ts_freq_mens_cinema_0020_corr, model = "ZZZ", lags = c(1, 12), select = TRUE)
+fit_ADAM_ETS
+summary(fit_ADAM_ETS)
+
+prev_ADAM_ETS <- forecast(fit_ADAM_ETS, h=12)
+plot(prev_ADAM_ETS)
+
+#### ADAM ETS + SARIMA ----
+
+# on va avoir le même modèle
+
+fit_AES <- auto.adam(ts_freq_mens_cinema_0020_corr, model="ZZN", lags=c(1,12), orders=list(ar=c(6,6), i=(6),
+                                                                ma=c(6,6), select=TRUE))
+fit_AES
+summary(fit_AES)
+
+prev_AES <- forecast(fit_AES, h=12)
+plot(prev_AES)
+
+#### SSARIMA ----
+
+fit_SSARIMA <- auto.ssarima(ts_freq_mens_cinema_0020_corr, lags=c(1,12), orders=list(ar=c(3,3), i=(2),
+                                                                                           ma=c(3,3), select=TRUE))
+fit_SSARIMA
+summary(fit_SSARIMA)
+
+prev_SSARIMA <- forecast(fit_SSARIMA, h=12)
+plot(prev_SSARIMA) 
 
 
 
