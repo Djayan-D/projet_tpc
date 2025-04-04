@@ -271,49 +271,29 @@ plot(serie_desaisson, main = "Série Désaisonnalisée", col = "blue", lwd = 2)
 # Retourner les données désaisonnalisées
 serie_desaisson
 
-# Lissage exponentiel
-
-# Méthode LED tiens compte de la tendance mais pas de la saisonnalité
-
-serie_desaisson_LED <- HoltWinters(serie_desaisson,gamma=FALSE) 
-
-show(serie_desaisson_LED)
-plot(serie_desaisson_LED)
-plot(serie_desaisson_LED$fitted[,1])
-
-# Smoothing parameters:
-# alpha: 0.3460451
-# beta : 0.09966349
-# gamma: FALSE
-
-# Indique un lissage modéré des valeurs récentes.
-# Une valeur plus proche de 1 donnerait plus de poids aux observations récentes.
-
-# Une faible valeur de Beta signifie que la tendance évolue lentement.
-
-## La composante de tendance montre une augmentation générale au fil du temps,
-# avec des fluctuations bien visibles autour de la tendance.
 
 
 #-- 5. Prévision de la série saisonnière corrigée des points atypiques sur une année ----------
 
-## Estimer et prévoir les modèles suivants :
+## Estimer et prévoir les modèles suivants : ----
 
-### Forecasting with h number of periods for forecasting with StructTS
+### Les méthodes naïves ----
+
+####  StructTS ----
 
 fitsts = StructTS(ts_freq_mens_cinema_0020)
-prevsts <- forecast(fitsts,12)
+prevsts <- forecast(fitsts,12) #période d'une année
 show(prevsts) # pas mettre en annexe
 plot(prevsts) # en annexe
 
-### Forecasting with h number of periods for forecasting with stlm
+#### stlm ----
 
 fitstl = stlm(ts_freq_mens_cinema_0020)
 prevstl <- forecast(fitstl,12)
 show(prevstl)
 plot(prevstl)
 
-### Forecasting with X13
+#### X13 ----
 
 # prevX13 = predict(ts_freq_mens_cinema_0020, 12, prediction.interval = TRUE) # on spécifie les intervalles de confiance
 # plot(ts_freq_mens_cinema_0020, prevX13)
@@ -321,9 +301,25 @@ plot(prevstl)
 # prevp = prevX13[1]
 # show(prevp)
 
+### Prédiction sur les méthodes de lissage exponentiel ----
 
+#### Holt-winters ----
 
+WH_add<- HoltWinters(ts_freq_mens_cinema_0020,seasonal="add") # je spécifie schéma additif
+# on à ici une tendance et une saisonnalité
+show(WH_add)
+plot(WH_add)
+plot(WH_add$fitted[,1])
 
+library(forecast)
+fit_wh = forecast(WH_add, h=12)
+plot(fit_wh)
+show(fit_wh)
+# Point forecasts
+prevf_hw = fit_wh$mean
+show(prevf_hw)
+
+#### ETS ----
 
 
 
