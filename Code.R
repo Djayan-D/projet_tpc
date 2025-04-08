@@ -13,7 +13,7 @@ library(RJDemetra)
 library(forecast)
 library(tsoutliers)
 library(smooth)
-
+library(gridExtra)
 
 
 
@@ -201,51 +201,6 @@ ts_freq_mens_cinema_corr |>
   stats_desc()
 
 
-<<<<<<< HEAD
-
-#--- 3.1.3. Appliquer à la série 2000-2020 ---
-
-stats_desc(freq_mens_cinema_0020_long$Valeur)
-
-
-
-#----- 3.2. Vérifier les valeurs atypiques -----
-
-#--- 3.2.1. Identifier les valeurs atypiques ---
-
-outliers <- tso(ts_freq_mens_cinema_0020) 
-print(outliers)
-
-plot(outliers)
-show(outliers)
-
-# Mars 2008 (27 056 406 entrées)
-#
-# Le phénomène "Bienvenue chez les Ch’tis", sorti le 27 février 2008, a explosé 
-# tous les records en France. Ce film de Dany Boon est rapidement devenu le plus 
-# gros succès du box-office français (jusqu'à l'arrivée d'"Intouchables" en 2011).
-
-
-
-#--- 3.2.2. Traiter les valeurs atypiques ---
-
-ts_freq_mens_cinema_0020_corr <- outliers$yadj
-
-
-
-#--- 3.2.3. Visualiser la TS corrigée ---
-
-
-plot(ts_freq_mens_cinema_0020_corr / 1e6,
-     xlab = "Temps",
-     ylab = "Nombre d'entrées (en millions)",
-     main = "Série temporelle des valeurs mensuelles 2000-2020")
-
-
-#----- 3.4. Détecter la saisonnalité -----
-
-#--- 3.4.1. Graphiques ---
-=======
 # 2000 - 2020
 
 ts_freq_mens_cinema_0020_corr |> 
@@ -276,7 +231,6 @@ ts_freq_mens_cinema_0020_corr |>
 #----- 3.3. Détecter la saisonnalité -----
 
 #--- 3.3.1. Graphiques ---
->>>>>>> a89199b4a4a3fcd366b6e287dc0138bc5a9a4df3
 
 ts_freq_mens_cinema_0020_corr |> 
   decompose(, type = "additive") |> 
@@ -321,37 +275,35 @@ serie_desaisson
 
 #-- 5. Prévision de la série saisonnière corrigée des points atypiques sur une année ----------
 
-## Estimer et prévoir les modèles suivants : ----
+#-- 5. 1. Estimer et prévoir les modèles suivants ----------
 
-### Les méthodes naïves ----
+#-- 5. 1. 1. Les méthodes naïves ----------
+
 
 ####  StructTS ----
 
 fitsts = StructTS(ts_freq_mens_cinema_0020_corr)
 prevsts <- forecast(fitsts,12) #période d'une année
 show(prevsts) # pas mettre en annexe
-plot(prevsts) # en annexe
+prevsts_plot <- plot(prevsts) # en annexe
+summary(prevsts)
 
 #### stlm ----
 
 fitstl = stlm(ts_freq_mens_cinema_0020_corr)
 prevstl <- forecast(fitstl,12)
 show(prevstl)
-plot(prevstl)
+prevstl_prevstl <- plot(prevstl)
+summary(prevstl)
 
 #### X13 ----
 
-# prevX13 = predict(ts_freq_mens_cinema_0020_corr, 12, prediction.interval = TRUE) # on spécifie les intervalles de confiance
-# plot(ts_freq_mens_cinema_0020_corr, prevX13)
-# show(prevX13)
-# prevp = prevX13[1]
-# show(prevp)
+#-- 5. 1. 2. Prédiction sur les méthodes de lissage exponentiel ----------
 
-### Prédiction sur les méthodes de lissage exponentiel ----
 
 #### Holt-winters ----
 
-WH_add<- HoltWinters(ts_freq_mens_cinema_0020_corr,seasonal="add") # je spécifie schéma additif
+WH_add<- HoltWinters(ts_freq_mens_cinema_0020_corr,seasonal="mu") # je spécifie schéma additif
 # on a ici une tendance et une saisonnalité
 show(WH_add)
 plot(WH_add)
@@ -359,7 +311,7 @@ plot(WH_add$fitted[,1])
 
 library(forecast)
 fit_wh = forecast(WH_add, h=12)
-plot(fit_wh)
+plot_fit_wh <- plot(fit_wh)
 show(fit_wh)
 # Point forecasts
 prevf_hw = fit_wh$mean
@@ -372,7 +324,7 @@ show(fit_ets)
 plot(fit_ets)
 
 prev_ETS <- forecast(fit_ets, h=12)
-plot(prev_ETS)
+plot_prev_ETS <- plot(prev_ETS)
 
 #### TBATS ----
 
@@ -381,38 +333,108 @@ show(fit_tbats)
 plot(fit_tbats)
 
 prev_TBATS <- forecast(fit_tbats, h=12)
-plot(prev_TBATS)
+plot_prev_TBATS <- plot(prev_TBATS)
 
 #### ADAM ETS ----
 
 fit_ADAM_ETS <- auto.adam(ts_freq_mens_cinema_0020_corr, model = "ZZZ", lags = c(1, 12), select = TRUE)
-fit_ADAM_ETS
 summary(fit_ADAM_ETS)
+plot(fit_ADAM_ETS)
+
 
 prev_ADAM_ETS <- forecast(fit_ADAM_ETS, h=12)
+show(prev_ADAM_ETS)
 plot(prev_ADAM_ETS)
 
 #### ADAM ETS + SARIMA ----
 
 # on va avoir le même modèle
 
-fit_AES <- auto.adam(ts_freq_mens_cinema_0020_corr, model="ZZN", lags=c(1,12), orders=list(ar=c(6,6), i=(6),
-                                                                ma=c(6,6), select=TRUE))
+fit_AES <- auto.adam(ts_freq_mens_cinema_0020_corr, model="ZZZ", lags=c(1,1,12), orders=list(ar=c(3,3), i=(3),
+                                                                                           ma=c(3,3), select=TRUE))
 fit_AES
 summary(fit_AES)
 
 prev_AES <- forecast(fit_AES, h=12)
-plot(prev_AES)
+plot_prev_AES <- plot(prev_AES)
 
 #### SSARIMA ----
 
 fit_SSARIMA <- auto.ssarima(ts_freq_mens_cinema_0020_corr, lags=c(1,12), orders=list(ar=c(3,3), i=(2),
-                                                                                           ma=c(3,3), select=TRUE))
+                                                                                     ma=c(3,3), select=TRUE))
 fit_SSARIMA
 summary(fit_SSARIMA)
 
 prev_SSARIMA <- forecast(fit_SSARIMA, h=12)
-plot(prev_SSARIMA) 
+plot_prev_SSARIMA <- plot(prev_SSARIMA) 
+
+#-- 5. 1. 3. Modèle SARIMA(p, d, q)(P, D, Q)[12] ----------
+
+
+# Ajustement du modèle SARIMA
+fit_sarima <- auto.arima(ts_freq_mens_cinema_0020_corr, seasonal = TRUE)
+
+# Affichage du modèle
+summary(fit_sarima)
+plot(fit_sarima$residuals)
+
+# Prévision sur 12 périodes
+prev_SARIMA <- forecast(fit_sarima, h=12)
+
+# Affichage des prévisions
+
+plot_prev_SARIMA <- plot(prev_SARIMA)
+
+#-- 5. 2.  le meilleur modèle d’après les critères AIC et AICc ----------
+
+# ADAM ETS + SARIMA
+
+#---------- 6. Représenter graphiquement l’évolution des prévisions des différents modèles ----------
+
+par(mfrow=c(3, 2))
+
+plot(prevsts)
+plot(prevstl)
+plot(fit_wh)
+plot(prev_ETS)
+plot(prev_TBATS)
+plot(prev_ADAM_ETS)
+
+
+par(mfrow=c(1, 1))
+
+
+plot(prev_AES)
+plot(prev_SSARIMA)
+plot(prev_SARIMA)
+
+
+     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
