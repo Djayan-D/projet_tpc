@@ -18,6 +18,7 @@ library(gridExtra)
 
 
 
+
 #---------- 2. IMPORTER LES DONNÉES ----------
 
 #----- 2.1. Charger les données -----
@@ -280,6 +281,42 @@ serie_desaisson
 #-- 5. 1. 1. Les méthodes naïves ----------
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+# ne pas run ça c'est pas prêt
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ####  StructTS ----
 
 fitsts = StructTS(ts_freq_mens_cinema_0020_corr)
@@ -411,32 +448,7 @@ plot(prev_SARIMA)
 
      
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# ne pas run jusqu'ici
 
 
 
