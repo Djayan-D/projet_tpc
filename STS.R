@@ -7,6 +7,7 @@ prevsts <- forecast(fitsts, 12)
 show(prevsts) # pas mettre en annexe
 plot(prevsts) # en annexe
 
+
 ### --------- Commentaires ------- ###
 
 
