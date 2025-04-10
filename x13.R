@@ -36,11 +36,15 @@ mysax13
 plot(mysax13$final)
 
 
-### --------- Commentaires -------###
+### --------- Commentaires ------- ###
 
 # Modèle RegArima(1,0,0)(0,1,1) avec transformation logarithmique 
 
 ## y = regression model + arima (1, 0, 0, 0, 1, 1)
+## AR(1) : Composante autorégressive d'ordre 1.
+## MA(1) : Composante de moyenne mobile d'ordre 1.
+## Différenciation saisonnière d'ordre 1.
+##
 ## Log-transformation: yes ==> décomposition multiplicative
 ## Pas de composante de jours ouvrables, d'années bissextile ni pâques ni d'outliers
 ## 
