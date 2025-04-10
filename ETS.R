@@ -37,4 +37,5 @@ plot(prevets)
 ## gamma = 1e-04 : Une valeur très faible indique que le modèle est
 ## très peu réactif aux changements dans la saisonnalité.
 ## Cela signifie que le modèle met beaucoup de temps à ajuster la composante saisonnière en réponse aux nouvelles données.
-
+##
+## AIC 8339.824   /  AICc 8341.967   /   BIC 8392.034 
