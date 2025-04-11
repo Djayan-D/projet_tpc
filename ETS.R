@@ -1,15 +1,3 @@
-# Smoothing parameters:
-# alpha = 0.8561 
-# beta  = 0.1282 
-# gamma = 0.1439 
-# phi   = 0.9403 # pour la courbure
-
-## Approfondir cette section là sur la compréhension
-# ETS ça va très vite (interprétation et codage)
-
-# Uniquement pour prévisions (je crois c'est ce qu'il à dit)
-
-
 fitets <- ets(ts_freq_mens_cinema_0020_corr, ic = "aic") # pour avoir le meilleur AIC
 show(fitets)
 plot(fitets)

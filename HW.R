@@ -38,9 +38,9 @@ print(aicc_value)
 
 
 # horizon h=50 - intervals 95%
-p = predict(WH_add, 50, prediction.interval = TRUE) 
-plot(WH_add, p)
-show(p)
+# p = predict(WH_add, 50, prediction.interval = TRUE) 
+# plot(WH_add, p)
+# show(p)
  
 
 ## -------- avec forecast  -------- ##
@@ -61,7 +61,8 @@ show(fit)
 ## beta = 0.01476799 prévision très souple : forte influence des observations les plus récentes
 ## paramètre de lissage pour la saisonnalité
 ## gamma = 0.2192295 prévisio lisse : fort poids du passé récent
-
+##
+## composante additive
 
 
 

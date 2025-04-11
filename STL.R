@@ -20,3 +20,8 @@ summary(prevstl)
 ## N : Pas de saisonnalité dans ETS car captée séparément par STL
 ##
 ## AIC 8247.401  /  AICc 8247.503  /   BIC 8257.843 
+##
+## Graphiquement:
+## la saisonnalité bien représentée
+## on voit une certaine tendance malgré que le modèle dit le contraire
+## rien dans les résidus
