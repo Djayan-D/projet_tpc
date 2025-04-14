@@ -578,6 +578,12 @@ cspe_list <- lapply(forecasts, function(fcast) {
   calculate_cspe(as.numeric(actual_values), as.numeric(fcast))
 })
 
+# Convertir en data frame pour le traçage
+cspe_df <- do.call(cbind, cspe_list)
+colnames(cspe_df) <- c("ADAM_ETS", "AES", "ETS", "fit", "SARIMA", "SSARIMA", "STL", "STS", "TBATS", "X13")
+cspe_df <- cbind(Date = as.Date(time(actual_values)), cspe_df)
+
+
 # Convertir la matrice en data frame
 cspe_df <- as.data.frame(cspe_df)
 
