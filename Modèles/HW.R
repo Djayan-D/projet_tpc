@@ -6,7 +6,7 @@ cvs <- final(seasX)
 
 # lissage
 WH_add = HoltWinters(cvs) # partie constante, tendance et saisonnalité et choix additif ou multiplicatif
-#WH_add = HoltWinters(cvs, seasonal = "mu") # il suppose un modèle add de base donc je change à la main
+#WH_add = HoltWinters(cvs, seasonal = "mul") # il suppose un modèle add de base donc je change à la main
 show(WH_add)
 summary(WH_add)
 plot(WH_add)
