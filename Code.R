@@ -310,6 +310,16 @@ summary(prevstl)
 
 #### X13 ----
 
+myspec <- x13_spec("RSA5c")
+
+mysax13 <- x13(ts_freq_mens_cinema_0020_corr, myspec)
+
+summary(mysax13$regarima)
+
+mysax13
+
+plot(mysax13$final)
+
 # Extraire la série désaisonnalisée
 sa_series <- mysax13$final$series[, "sa"]
 
