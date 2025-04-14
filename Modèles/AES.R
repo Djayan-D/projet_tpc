@@ -32,7 +32,7 @@ summary(fitadam3)
 par(mfcol=c(2,2))
 plot(fitadam3)
 
-
+par(mfcol=c(1,1))
 plot(fitadam3$states)
 plot(fitadam3$residuals)
 

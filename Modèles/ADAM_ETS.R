@@ -9,6 +9,8 @@ summary(fit_ADAM_ETS)
 par(mfcol=c(2,2))
 plot(fit_ADAM_ETS)
 
+par(mfcol=c(1,1))
+
 
 plot(fit_ADAM_ETS$states)
 plot(fit_ADAM_ETS$residuals)
