@@ -13,11 +13,6 @@ library(seasonal)
 # # Extraire le modèle ARIMA utilisé
 # arima_model <- auto.arima(ts_freq_mens_cinema_0020_corr)
 # 
-# # Prévisions sur 12 mois
-# forecast_x13 <- forecast(arima_model, h = 12)
-# 
-# # Visualisation
-# autoplot(forecast_x13)
 
 ## --------- Autre méthode -------## 
 
@@ -34,6 +29,18 @@ summary(mysax13$regarima)
 mysax13
 
 plot(mysax13$final)
+
+library(forecast)
+
+# Extraire la série désaisonnalisée
+sa_series <- mysax13$final$series[, "sa"]
+
+# Appliquer la prévision sur 12 périodes
+forecast_x13 <- forecast(sa_series, h = 12)
+
+# Visualiser le résultat
+plot(forecast_x13)
+
 
 
 ### --------- Commentaires ------- ###

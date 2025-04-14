@@ -315,6 +315,65 @@ serie_desaisson
 
 #---------- 6. Représenter graphiquement l’évolution des prévisions des différents modèles ----------
 
+ts_freq_mens_cinema_2021 <- ts(ts_freq_mens_cinema_corr, 
+                               start = c(2020, 1), end =c(2020, 12),
+                               frequency = 12)
+
+library(ggplot2)
+library(dplyr)
+library(zoo)
+library(scales)  # Pour formater l'axe des dates
+
+# Fonction mise à jour : transforme la date en format mois
+extract_forecast_df <- function(fcast_obj, name) {
+  df <- data.frame(
+    date = as.Date(as.yearmon(time(fcast_obj$mean))),  # conversion en date
+    value = as.numeric(fcast_obj$mean),
+    model = name
+  )
+  df %>% slice_head(n = 12)
+}
+
+# Appliquer la fonction à chaque objet de prévision
+dfs <- list(
+  extract_forecast_df(prev_ADAM_ETS, "ADAM_ETS"),
+  extract_forecast_df(prev_AES, "AES"),
+  extract_forecast_df(prevets, "ETS"),
+  extract_forecast_df(fit, "fit"),
+  extract_forecast_df(prev_SARIMA, "SARIMA"),
+  extract_forecast_df(prev_SSARIMA, "SSARIMA"),
+  extract_forecast_df(prevstl, "STL"),
+  extract_forecast_df(prevsts, "STS"),
+  extract_forecast_df(prev_TBATS, "TBATS"),
+  extract_forecast_df(forecast_x13, "X13")
+)
+
+# Regrouper tous les modèles ensemble
+df_all <- bind_rows(dfs)
+
+# Transformer la série temporelle en data frame pour ggplot
+ts_freq_mens_cinema_2021_df <- data.frame(
+  date = as.Date(time(ts_freq_mens_cinema_2021)),
+  value = as.numeric(ts_freq_mens_cinema_2021),
+  model = "Observed Data"
+)
+
+# Affichage avec mois formatés
+ggplot() +
+  geom_line(data = df_all, aes(x = date, y = value, color = model), size = 1) +
+  geom_line(data = ts_freq_mens_cinema_2021_df, aes(x = date, y = value),
+            linetype = "dashed", color = "black", size = 1) +
+  labs(title = "Prévisions sur 12 mois par modèle",
+       x = "Mois", y = "Valeur prévue", color = "Modèle") +
+  scale_x_date(date_labels = "%b %Y", date_breaks = "1 month") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "bottom")
+
+
+#---------- 7. Représenter graphiquement l’évolution des prévisions des différents modèles ----------
+
+
 
 
 

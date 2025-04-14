@@ -11,10 +11,6 @@ plot(fitAES$states)
 plot(fitAES$residuals)
 
 
-prev_AES <- forecast(fitAES, h=12)
-show(prev_AES)
-plot(prev_AES)
-
 ### --------- Commentaires ------- ###
 
 ##La composante résiduelle du modèle ADAM ETS(M,A,N)+ARIMA(3,0,0) présente un
@@ -35,6 +31,10 @@ plot(fitadam3)
 par(mfcol=c(1,1))
 plot(fitadam3$states)
 plot(fitadam3$residuals)
+
+prev_AES <- forecast(fitadam3,12)
+show(prev_AES)
+plot(prev_AES)
 
 ### --------- Commentaires 2 ------- ###
 
