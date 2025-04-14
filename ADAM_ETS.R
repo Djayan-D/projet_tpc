@@ -5,9 +5,9 @@ fit_ADAM_ETS <- auto.adam(ts_freq_mens_cinema_0020_corr, model = "ZZZ", lags = c
 # ZZZ car je ne spécifie rien (tendance, saisonnalité, erreur)
 fit_ADAM_ETS
 summary(fit_ADAM_ETS)
+
+par(mfcol=c(2,2))
 plot(fit_ADAM_ETS)
-
-
 
 
 plot(fit_ADAM_ETS$states)
