@@ -52,6 +52,7 @@ freq_mens_cinema_0020 <- freq_mens_cinema |>
 
 
 
+
 #--- 2.2.4. Convertir les données en format long ---
 
 freq_mens_cinema_long <- freq_mens_cinema |> 
@@ -282,30 +283,172 @@ serie_desaisson
 
 ####  StructTS ----
 
+fitsts = StructTS(ts_freq_mens_cinema_0020_corr)
+plot(cbind(fitted(fitsts), residuals(fitsts)))
+show(fitsts)
+
+summary(fitsts)
+prevsts <- forecast(fitsts, 12) 
+show(prevsts) 
+plot(prevsts)
 
 #### stlm ----
 
+decomp = stl(ts_freq_mens_cinema_0020_corr, s.window="periodic")
+# show(decomp)
+plot(decomp)
+
+fitstl = stlm(ts_freq_mens_cinema_0020_corr)
+
+prevstl <- forecast(fitstl,12) #période d'une année
+
+# show(prevsts) # pas mettre en annexe
+
+plot(prevstl) # en annexe
+
+summary(prevstl)
 
 #### X13 ----
+
+# Extraire la série désaisonnalisée
+sa_series <- mysax13$final$series[, "sa"]
+
+# Appliquer la prévision sur 12 périodes
+forecast_x13 <- forecast(sa_series, h = 12)
+
+# Visualiser le résultat
+plot(forecast_x13)
+
 
 #-- 5. 1. 2. Prédiction sur les méthodes de lissage exponentiel ----------
 
 
 #### Holt-winters ----
 
+seasX <- seas(ts_freq_mens_cinema_0020_corr)
+cvs <- final(seasX)
+
+# lissage
+WH_add = HoltWinters(cvs) # partie constante, tendance et saisonnalité et choix additif ou multiplicatif
+#WH_add = HoltWinters(cvs, seasonal = "mul") # il suppose un modèle add de base donc je change à la main
+show(WH_add)
+summary(WH_add)
+plot(WH_add)
+plot(WH_add$fitted[,1])
+
+# Calcul de l'AIC
+# Calcul des résidus
+residuals <- residuals(WH_add)
+
+# Calcul du MSE
+mse <- mean(residuals^2)
+
+# Estimation de la vraisemblance
+n <- length(cvs)  # nombre d'observations
+k <- length(coef(WH_add))  # nombre de paramètres
+log_likelihood <- -(n/2) * log(2 * pi * mse) - (1/2) * sum(residuals^2 / mse)
+
+
+aic_value <- 2 * k - 2 * log_likelihood
+print(aic_value)
+
+# Calcul de l'AICc
+aicc_value <- aic_value + (2 * k * (k + 1)) / (n - k - 1)
+print(aicc_value)
+
+# horizon h=50 - intervals 80% & 95%
+library(forecast)
+fit = forecast(WH_add, h=50)
+plot(fit)
+show(fit)
 
 #### ETS ----
 
+fitets <- ets(ts_freq_mens_cinema_0020_corr, ic = "aic") # pour avoir le meilleur AIC
+show(fitets)
+plot(fitets)
+
+
+prevets <- forecast(fitets,12)
+show(prevets)
+plot(prevets)
+
 #### TBATS ----
+
+fit_tbats <- tbats(ts_freq_mens_cinema_0020_corr)
+show(fit_tbats)
+plot(fit_tbats)
+
+prev_TBATS <- forecast(fit_tbats, h=12)
+plot_prev_TBATS <- plot(prev_TBATS)
 
 #### ADAM ETS ----
 
+fit_ADAM_ETS <- auto.adam(ts_freq_mens_cinema_0020_corr, model = "ZZZ", lags = c(1, 12), select = TRUE)
+# ZZZ car je ne spécifie rien (tendance, saisonnalité, erreur)
+fit_ADAM_ETS
+summary(fit_ADAM_ETS)
+
+par(mfcol=c(2,2))
+plot(fit_ADAM_ETS)
+
+par(mfcol=c(1,1))
+
+
+plot(fit_ADAM_ETS$states)
+plot(fit_ADAM_ETS$residuals)
+
+
+prev_ADAM_ETS <- forecast(fit_ADAM_ETS, h=12)
+show(prev_ADAM_ETS)
+plot(prev_ADAM_ETS)
+
 #### ADAM ETS + SARIMA ----
+
+fitadam3 <- auto.adam(ts_freq_mens_cinema_0020_corr, model="ZZN", lags=c(1,12), orders=list(ar=c(3,3), i=(2),
+                                                                                            ma=c(3,3), select=TRUE))
+fitadam3
+summary(fitadam3)
+
+par(mfcol=c(2,2))
+plot(fitadam3)
+
+par(mfcol=c(1,1))
+plot(fitadam3$states)
+plot(fitadam3$residuals)
+
+prev_AES <- forecast(fitadam3,12)
+show(prev_AES)
+plot(prev_AES)
 
 #### SSARIMA ----
 
+fit_SSARIMA <- auto.ssarima(ts_freq_mens_cinema_0020_corr, lags=c(1,12), orders=list(ar=c(3,3), i=(2), ma=c(3,3), select=TRUE))
+fit_SSARIMA
+
+par(mfcol=c(2,2))
+plot(fit_SSARIMA)
+
+plot(fit_SSARIMA$residuals)
+
+prev_SSARIMA <- forecast(fit_SSARIMA, h=12)
+prev_SSARIMA
+plot(prev_SSARIMA)
+
 #-- 5. 1. 3. Modèle SARIMA(p, d, q)(P, D, Q)[12] ----------
 
+fit_sarima <- auto.arima(ts_freq_mens_cinema_0020_corr, seasonal = TRUE)
+
+# Affichage du modèle
+summary(fit_sarima)
+plot(fit_sarima$residuals)
+
+# Prévision sur 12 périodes
+prev_SARIMA <- forecast(fit_sarima, h=12)
+
+# Affichage des prévisions
+
+plot(prev_SARIMA)
 
 #-- 5. 2.  le meilleur modèle d’après les critères AIC et AICc ----------
 
@@ -371,9 +514,168 @@ ggplot() +
         legend.position = "bottom")
 
 
-#---------- 7. Représenter graphiquement l’évolution des prévisions des différents modèles ----------
+#---------- 7. Qualité de prévision ----------
 
+## MSE & R²OOS
 
+# Exemple de données (à remplacer par vos données réelles)
+actual_values <- ts_freq_mens_cinema_2021
 
+# Liste des prévisions pour chaque modèle
+forecasts <- list(
+  prev_ADAM_ETS$mean,
+  prev_AES$mean,
+  prevets$mean,
+  fit$mean,
+  prev_SARIMA$mean,
+  prev_SSARIMA$mean,
+  prevstl$mean,
+  prevsts$mean,
+  prev_TBATS$mean,
+  forecast_x13$mean
+)
 
+# Fonction pour calculer MSE et R²OOS
+calculate_metrics <- function(actual, forecast) {
+  mse <- mean((actual - forecast)^2)
+  sst <- sum((actual - mean(actual))^2)
+  sse <- sum((actual - forecast)^2)
+  r2oos <- 1 - (sse / sst)
+  return(list(mse = mse, r2oos = r2oos))
+}
 
+# Calculer les métriques pour chaque modèle
+metrics <- lapply(forecasts, function(fcast) {
+  calculate_metrics(as.numeric(actual_values), as.numeric(fcast))
+})
+
+# Convertir en data frame pour une meilleure lisibilité
+metrics_df <- as.data.frame(do.call(rbind, metrics))
+rownames(metrics_df) <- c("ADAM_ETS", "AES", "ETS", "HW", "SARIMA", "SSARIMA", "STL", "STS", "TBATS", "X13")
+print(metrics_df)
+
+## CSPE
+
+# Fonction pour calculer les CSPE
+calculate_cspe <- function(actual, forecast) {
+  errors <- (actual - forecast)^2
+  cspe <- cumsum(errors)
+  return(cspe)
+}
+
+# Calculer les CSPE pour chaque modèle
+cspe_list <- lapply(forecasts, function(fcast) {
+  calculate_cspe(as.numeric(actual_values), as.numeric(fcast))
+})
+
+# Convertir la matrice en data frame
+cspe_df <- as.data.frame(cspe_df)
+
+# Vérifier la structure du data frame
+str(cspe_df)
+
+# Utiliser pivot_longer pour transformer le data frame
+cspe_df_long <- pivot_longer(cspe_df, cols = -Date, names_to = "Model", values_to = "CSPE")
+
+# Tracer les CSPE
+ggplot(cspe_df_long, aes(x = Date, y = CSPE, color = Model)) +
+  geom_line() +
+  labs(title = "Cumulative Squared Prediction Errors (CSPE)",
+       x = "Date", y = "CSPE", color = "Model") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+#---------- 8. Test de précision ----------
+
+# Définir la période de temps
+start_date <- c(2020, 1)
+end_date <- c(2020, 12)
+
+# Fonction pour ajuster les séries temporelles
+adjust_time_series <- function(ts_data) {
+  return(window(ts_data, start = start_date, end = end_date))
+}
+
+# Ajuster les séries temporelles pour chaque modèle
+for_observed <- adjust_time_series(ts_freq_mens_cinema_2021)
+for_ADAM_ETS <- adjust_time_series(prev_ADAM_ETS$mean)
+for_AES <- adjust_time_series(prev_AES$mean)
+for_ETS <- adjust_time_series(prevets$mean)
+for_fit <- adjust_time_series(fit$mean)
+for_SARIMA <- adjust_time_series(prev_SARIMA$mean)
+for_SSARIMA <- adjust_time_series(prev_SSARIMA$mean)
+for_STL <- adjust_time_series(prevstl$mean)
+for_STS <- adjust_time_series(prevsts$mean)
+for_TBATS <- adjust_time_series(prev_TBATS$mean)
+for_X13 <- adjust_time_series(forecast_x13$mean)
+
+# Vérifiez que toutes les séries temporelles ont la bonne longueur
+print(length(for_observed))
+print(length(for_ADAM_ETS))
+print(length(for_AES))
+print(length(for_ETS))
+print(length(for_fit))
+print(length(for_SARIMA))
+print(length(for_SSARIMA))
+print(length(for_STL))
+print(length(for_STS))
+print(length(for_TBATS))
+print(length(for_X13))
+
+# Calculer les erreurs de prévision
+error_ADAM_ETS <- for_ADAM_ETS - for_observed
+error_AES <- for_AES - for_observed
+error_ETS <- for_ETS - for_observed
+error_fit <- for_fit - for_observed
+error_SARIMA <- for_SARIMA - for_observed
+error_SSARIMA <- for_SSARIMA - for_observed
+error_STL <- for_STL - for_observed
+error_STS <- for_STS - for_observed
+error_TBATS <- for_TBATS - for_observed
+error_X13 <- for_X13 - for_observed
+
+# Calculer les MSE
+mse_ADAM_ETS <- mean(error_ADAM_ETS^2)
+mse_AES <- mean(error_AES^2)
+mse_ETS <- mean(error_ETS^2)
+mse_fit <- mean(error_fit^2)
+mse_SARIMA <- mean(error_SARIMA^2)
+mse_SSARIMA <- mean(error_SSARIMA^2)
+mse_STL <- mean(error_STL^2)
+mse_STS <- mean(error_STS^2)
+mse_TBATS <- mean(error_TBATS^2)
+mse_X13 <- mean(error_X13^2)
+
+# Calculer d'autres mesures d'erreur
+accuracy(for_ADAM_ETS, for_observed, h = 12)
+accuracy(for_AES, for_observed, h = 12)
+accuracy(for_ETS, for_observed, h = 12)
+accuracy(for_fit, for_observed, h = 12)
+accuracy(for_SARIMA, for_observed, h = 12)
+accuracy(for_SSARIMA, for_observed, h = 12)
+accuracy(for_STL, for_observed, h = 12)
+accuracy(for_STS, for_observed, h = 12)
+accuracy(for_TBATS, for_observed, h = 12)
+accuracy(for_X13, for_observed, h = 12)
+
+# Calculer le test DM
+dm.test(error_ADAM_ETS, error_AES, h = length(for_observed))
+dm.test(error_ADAM_ETS, error_ETS, h = length(for_observed))
+dm.test(error_ADAM_ETS, error_fit, h = length(for_observed))
+dm.test(error_ADAM_ETS, error_SARIMA, h = length(for_observed))
+dm.test(error_ADAM_ETS, error_SSARIMA, h = length(for_observed))
+dm.test(error_ADAM_ETS, error_STL, h = length(for_observed))
+dm.test(error_ADAM_ETS, error_STS, h = length(for_observed))
+dm.test(error_ADAM_ETS, error_TBATS, h = length(for_observed))
+dm.test(error_ADAM_ETS, error_X13, h = length(for_observed))
+
+# Calculer le test DM avec h=1
+dm.test(error_ADAM_ETS, error_AES, h = 1)
+dm.test(error_ADAM_ETS, error_ETS, h = 1)
+dm.test(error_ADAM_ETS, error_fit, h = 1)
+dm.test(error_ADAM_ETS, error_SARIMA, h = 1)
+dm.test(error_ADAM_ETS, error_SSARIMA, h = 1)
+dm.test(error_ADAM_ETS, error_STL, h = 1)
+dm.test(error_ADAM_ETS, error_STS, h = 1)
+dm.test(error_ADAM_ETS, error_TBATS, h = 1)
+dm.test(error_ADAM_ETS, error_X13, h = 1)
