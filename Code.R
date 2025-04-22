@@ -247,6 +247,7 @@ month <- cycle(ts_freq_mens_cinema_0020_corr)
 kruskal.test(as.numeric(ts_freq_mens_cinema_0020_corr) ~ factor(month))
 
 # p-value < 2.2e-16 < 0.05 : la série est saisonnière
+
 #--- 3.3.2. périodogramme ---
 
 # pour avoir la série en différence première
@@ -256,6 +257,10 @@ par(mfrow=c(1,2))
 periodogram(ts_freq_mens_cinema_0020_corr, main="Periodogramme sur la série en niveau")
 periodogram(dyy, main="Periodogramme sur la série en différence première")
 par(mfrow=c(1,1))
+
+# Sur le graphique du Periodogramme sur la série en différence première:
+# nous pouvons voir une récurrence des observations sur 4 différentes fréquences
+# donc preuve de la saisonnalité de notre série
 
 
 #---------- 4. DÉSAISONNALISATION ET DÉCOMPOSITION ----------
