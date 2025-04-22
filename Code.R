@@ -765,7 +765,7 @@ fit <- tso(ts_freq_mens_cinema_0020)
 adj <- fit$yadj
 adj <- ts(adj)
 
-estim <- 228 # 240 - 12 = 228
+estim <- 240 
 h <- 12
 format <- matrix(nrow=h, ncol=1)
 
