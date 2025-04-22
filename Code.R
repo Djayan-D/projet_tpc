@@ -694,28 +694,34 @@ accuracy(for_X13, for_observed, h = 12)
 accuracy(for_NAÏVE, for_observed, h = 12)
 
 
-# Calculer le test DM
-dm.test(error_ADAM_ETS, error_AES, h = length(for_observed))
-dm.test(error_ADAM_ETS, error_ETS, h = length(for_observed))
-dm.test(error_ADAM_ETS, error_fit, h = length(for_observed))
-dm.test(error_ADAM_ETS, error_SARIMA, h = length(for_observed))
-dm.test(error_ADAM_ETS, error_SSARIMA, h = length(for_observed))
-dm.test(error_ADAM_ETS, error_STL, h = length(for_observed))
-dm.test(error_ADAM_ETS, error_STS, h = length(for_observed))
-dm.test(error_ADAM_ETS, error_TBATS, h = length(for_observed))
-dm.test(error_ADAM_ETS, error_X13, h = length(for_observed))
-dm.test(error_ADAM_ETS, error_NAIVE, h = length(for_observed))
+# Calculer le test DM ----
+
+## On n'utilise pas l'option "less" car les valeurs retournée du test ne sont pas significatives
+## ce qui est contraire aux observations graphiques.
+## On garde donc le test sans l'option.
+
+dm.test(error_NAIVE, error_ADAM_ETS, h = length(for_observed))
+dm.test(error_NAIVE, error_AES, h = length(for_observed))
+dm.test(error_NAIVE, error_ETS, h = length(for_observed))
+dm.test(error_NAIVE, error_fit, h = length(for_observed))
+dm.test(error_NAIVE, error_SARIMA, h = length(for_observed))
+dm.test(error_NAIVE, error_SSARIMA, h = length(for_observed))
+dm.test(error_NAIVE, error_STL, h = length(for_observed))
+dm.test(error_NAIVE, error_STS, h = length(for_observed))
+dm.test(error_NAIVE, error_TBATS, h = length(for_observed))
+dm.test(error_NAIVE, error_X13, h = length(for_observed))
 
 
 # Calculer le test DM avec h=1
-dm.test(error_ADAM_ETS, error_AES, h = 1)
-dm.test(error_ADAM_ETS, error_ETS, h = 1)
-dm.test(error_ADAM_ETS, error_fit, h = 1)
-dm.test(error_ADAM_ETS, error_SARIMA, h = 1)
-dm.test(error_ADAM_ETS, error_SSARIMA, h = 1)
-dm.test(error_ADAM_ETS, error_STL, h = 1)
-dm.test(error_ADAM_ETS, error_STS, h = 1)
-dm.test(error_ADAM_ETS, error_TBATS, h = 1)
-dm.test(error_ADAM_ETS, error_X13, h = 1)
-dm.test(error_ADAM_ETS, error_NAIVE, h = 1)
+dm.test(error_NAIVE, error_ADAM_ETS, h = 1)
+dm.test(error_NAIVE, error_AES, h = 1)
+dm.test(error_NAIVE, error_ETS, h = 1)
+dm.test(error_NAIVE, error_fit, h = 1)
+dm.test(error_NAIVE, error_SARIMA, h = 1)
+dm.test(error_NAIVE, error_SSARIMA, h = 1)
+dm.test(error_NAIVE, error_STL, h = 1)
+dm.test(error_NAIVE, error_STS, h = 1)
+dm.test(error_NAIVE, error_TBATS, h = 1)
+dm.test(error_NAIVE, error_X13, h = 1)
 
+## le meilleur modèle est X13
