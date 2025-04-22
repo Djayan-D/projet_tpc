@@ -15,7 +15,8 @@ library(tsoutliers)
 library(smooth)
 library(gridExtra)
 library(scales)
-
+library(TSA)
+library(seastests)
 
 
 
@@ -233,7 +234,34 @@ ts_freq_mens_cinema_0020_corr |>
 
 #----- 3.3. Détecter la saisonnalité -----
 
-#--- 3.3.1. Graphiques ---
+
+#--- 3.3.1. tests ---
+
+# Webel-Ollech test
+combined_test(ts_freq_mens_cinema_0020_corr)
+
+P-value: 0  # saisonnalité très forte détectée
+
+# Test de Kruskal-Wallis
+month <- cycle(ts_freq_mens_cinema_0020_corr)
+kruskal.test(as.numeric(ts_freq_mens_cinema_0020_corr) ~ factor(month))
+
+p-value < 2.2e-16 < 0.05 # la série est saisonnière
+#--- 3.3.2. périodogramme ---
+
+# pour avoir la série en différence première
+dyy <- diff(ts_freq_mens_cinema_0020_corr, differences = 1)
+
+par(mfrow=c(1,2))
+periodogram(ts_freq_mens_cinema_0020_corr, main="Periodogramme sur la série en niveau")
+periodogram(dyy, main="Periodogramme sur la série en différence première")
+par(mfrow=c(1,1))
+
+
+#---------- 4. DÉSAISONNALISATION ET DÉCOMPOSITION ----------
+
+
+#--- 4.1. schéma de décomposition ---
 
 ts_freq_mens_cinema_0020_corr |> 
   decompose(, type = "additive") |> 
@@ -243,18 +271,13 @@ ts_freq_mens_cinema_0020_corr |>
   decompose(, type = "multiplicative") |> 
   plot()
 
-
 # Test
 
 summary(regarima_x13(ts_freq_mens_cinema_0020_corr, spec ="RG5c"))
 
 ## Multiplicatif est plus adapté
 
-
-
-
-
-#---------- 4. DÉSAISONNALISATION ET DÉCOMPOSITION ----------
+#--- 4.2. Désaisonnaliser et décomposer ---
 
 # Appliquer X13-ARIMA-SEATS sur la série corrigée
 x13_result <- seas(ts_freq_mens_cinema_0020_corr)
