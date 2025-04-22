@@ -725,3 +725,8 @@ dm.test(error_NAIVE, error_TBATS, h = 1)
 dm.test(error_NAIVE, error_X13, h = 1)
 
 ## le meilleur modèle est X13
+
+#---------- 9. Prévision ----------
+
+
+plot(forecast_x13)
