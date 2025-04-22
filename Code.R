@@ -276,13 +276,20 @@ ts_freq_mens_cinema_0020_corr |>
   decompose(, type = "multiplicative") |> 
   plot()
 
-# Test
 
 summary(regarima_x13(ts_freq_mens_cinema_0020_corr, spec ="RG5c"))
 
-## Multiplicatif est plus adapté
-
-#--- 4.2. Désaisonnaliser et décomposer ---
+# no trading days effect, no leap year effect, no Easter effect
+# il n'y a pas d'effets déterministes (avec les effets de calendrier )
+#
+# Modèle SARIMA : (1,0,0)(0,1,1)[12]
+# effet saisonnier à fréquence mensuel [12]
+# D = 1 : une différenciation saisonnière
+# d = 0 : pas de différenciation non saisonnière
+# Log-transformation: yes
+## effets multiplicatifs
+# Phi(1) = -0.17669 : significatif (p < 0.01) il y a un effet mémoire présent à court terme
+# BTheta(1) = -0.70568 :  significatif (p < 0.001) il y a présence d'un effet saisonnier fort
 
 # Appliquer X13-ARIMA-SEATS sur la série corrigée
 x13_result <- seas(ts_freq_mens_cinema_0020_corr)
