@@ -14,6 +14,7 @@ library(forecast)
 library(tsoutliers)
 library(smooth)
 library(gridExtra)
+library(scales)
 
 
 
@@ -373,7 +374,6 @@ aicc_value <- aic_value + (2 * k * (k + 1)) / (n - k - 1)
 print(aicc_value)
 
 # horizon h=50 - intervals 80% & 95%
-library(forecast)
 fit = forecast(WH_add, h=50)
 plot(fit)
 show(fit)
@@ -480,10 +480,6 @@ ts_freq_mens_cinema_2021 <- ts(ts_freq_mens_cinema_corr,
                                start = c(2020, 1), end =c(2020, 12),
                                frequency = 12)
 
-library(ggplot2)
-library(dplyr)
-library(zoo)
-library(scales)  # Pour formater l'axe des dates
 
 # Fonction mise à jour : transforme la date en format mois
 extract_forecast_df <- function(fcast_obj, name) {
