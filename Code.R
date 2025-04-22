@@ -546,9 +546,9 @@ forecasts <- list(
 )
 
 # Fonction pour calculer MSE et R²OOS
-calculate_metrics <- function(actual, forecast) {
+calculate_metrics <- function(actual, forecast, benchmark_forecast) {
   mse <- mean((actual - forecast)^2)
-  sst <- sum((actual - mean(actual))^2)
+  sst <- sum((actual - benchmark_forecast)^2)
   sse <- sum((actual - forecast)^2)
   r2oos <- 1 - (sse / sst)
   return(list(mse = mse, r2oos = r2oos))
@@ -556,7 +556,7 @@ calculate_metrics <- function(actual, forecast) {
 
 # Calculer les métriques pour chaque modèle
 metrics <- lapply(forecasts, function(fcast) {
-  calculate_metrics(as.numeric(actual_values), as.numeric(fcast))
+  calculate_metrics(as.numeric(actual_values), as.numeric(fcast), as.numeric(prevstl$mean))
 })
 
 # Convertir en data frame pour une meilleure lisibilité
