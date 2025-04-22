@@ -445,6 +445,8 @@ fit_SSARIMA
 par(mfcol=c(2,2))
 plot(fit_SSARIMA)
 
+par(mfcol=c(1,1))
+
 plot(fit_SSARIMA$residuals)
 
 prev_SSARIMA <- forecast(fit_SSARIMA, h=12)
@@ -460,7 +462,7 @@ summary(fit_sarima)
 plot(fit_sarima$residuals)
 
 # Prévision sur 12 périodes
-prev_SARIMA <- forecast(fit_sarima, h=12)
+prev_SARIMA <- forecast(fit_sarima, h=12) 
 
 # Affichage des prévisions
 
@@ -728,5 +730,36 @@ dm.test(error_NAIVE, error_X13, h = 1)
 
 #---------- 9. Prévision ----------
 
-plot(forecast_x13)
-show(forecast_x13)
+fit <- tso(ts_freq_mens_cinema_0020)
+adj <- fit$yadj
+adj <- ts(adj)
+
+estim <- 228 # 240 - 12 = 228
+h <- 12
+format <- matrix(nrow=h, ncol=1)
+
+for(i in 1:h)
+{
+  adj2 <- adj[i:(estim-1+i)]
+  adjdemetra <- ts(adj2, start = c(2000, 1),frequency = 12)
+  myregx13 <- regarima_x13(adjdemetra, spec ="RG5c")
+  forex13 <- matrix(myregx13$forecast[1])
+  forc <- as.numeric(forex13)
+  format[i,1] <- forc
+}
+
+
+# Affichage des prévisions
+print(format)
+
+
+# Création des mois à afficher
+mois <- format(seq(as.Date("2020-01-01"), by = "month", length.out = 12), "%b %Y")
+
+# Tracer les prévisions
+plot(format, type = "o", main = "Prévisions X-13 glissantes", ylab = "Valeur", xlab = "Mois", col = "navy", lwd = 2, xaxt = "n")
+
+# Ajouter les étiquettes des mois
+axis(1, at = 1:12, labels = mois, las = 2, cex.axis = 0.8)
+
+
