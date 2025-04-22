@@ -279,7 +279,13 @@ serie_desaisson
 
 #-- 5. 1. Estimer et prévoir les modèles suivants ----------
 
-#-- 5. 1. 1. Les méthodes naïves ----------
+#-- 5. 1. 1. Les premières méthodes ----------
+
+#### naïves ----
+
+pred_naive <- naive(ts_freq_mens_cinema_0020_corr, h=12)
+show(pred_naive)
+plot(pred_naive)
 
 ####  StructTS ----
 
@@ -498,7 +504,9 @@ dfs <- list(
   extract_forecast_df(prevstl, "STL"),
   extract_forecast_df(prevsts, "STS"),
   extract_forecast_df(prev_TBATS, "TBATS"),
-  extract_forecast_df(forecast_x13, "X13")
+  extract_forecast_df(forecast_x13, "X13"),
+  extract_forecast_df(pred_naive, "NAÏVE")
+  
 )
 
 # Regrouper tous les modèles ensemble
@@ -542,7 +550,8 @@ forecasts <- list(
   prevstl$mean,
   prevsts$mean,
   prev_TBATS$mean,
-  forecast_x13$mean
+  forecast_x13$mean,
+  pred_naive$mean
 )
 
 # Fonction pour calculer MSE et R²OOS
@@ -561,7 +570,7 @@ metrics <- lapply(forecasts, function(fcast) {
 
 # Convertir en data frame pour une meilleure lisibilité
 metrics_df <- as.data.frame(do.call(rbind, metrics))
-rownames(metrics_df) <- c("ADAM_ETS", "AES", "ETS", "HW", "SARIMA", "SSARIMA", "STL", "STS", "TBATS", "X13")
+rownames(metrics_df) <- c("ADAM_ETS", "AES", "ETS", "HW", "SARIMA", "SSARIMA", "STL", "STS", "TBATS", "X13", "NAÏVE")
 print(metrics_df)
 
 ## CSPE
@@ -580,7 +589,7 @@ cspe_list <- lapply(forecasts, function(fcast) {
 
 # Convertir en data frame pour le traçage
 cspe_df <- do.call(cbind, cspe_list)
-colnames(cspe_df) <- c("ADAM_ETS", "AES", "ETS", "fit", "SARIMA", "SSARIMA", "STL", "STS", "TBATS", "X13")
+colnames(cspe_df) <- c("ADAM_ETS", "AES", "ETS", "fit", "SARIMA", "SSARIMA", "STL", "STS", "TBATS", "X13", "NAÏVE")
 cspe_df <- cbind(Date = as.Date(time(actual_values)), cspe_df)
 
 
@@ -624,6 +633,8 @@ for_STL <- adjust_time_series(prevstl$mean)
 for_STS <- adjust_time_series(prevsts$mean)
 for_TBATS <- adjust_time_series(prev_TBATS$mean)
 for_X13 <- adjust_time_series(forecast_x13$mean)
+for_NAÏVE <- adjust_time_series(pred_naive$mean)
+
 
 # Vérifiez que toutes les séries temporelles ont la bonne longueur
 print(length(for_observed))
@@ -637,6 +648,8 @@ print(length(for_STL))
 print(length(for_STS))
 print(length(for_TBATS))
 print(length(for_X13))
+print(length(for_NAÏVE))
+
 
 # Calculer les erreurs de prévision
 error_ADAM_ETS <- for_ADAM_ETS - for_observed
@@ -649,6 +662,8 @@ error_STL <- for_STL - for_observed
 error_STS <- for_STS - for_observed
 error_TBATS <- for_TBATS - for_observed
 error_X13 <- for_X13 - for_observed
+error_NAIVE <- for_NAÏVE - for_observed
+
 
 # Calculer les MSE
 mse_ADAM_ETS <- mean(error_ADAM_ETS^2)
@@ -661,6 +676,9 @@ mse_STL <- mean(error_STL^2)
 mse_STS <- mean(error_STS^2)
 mse_TBATS <- mean(error_TBATS^2)
 mse_X13 <- mean(error_X13^2)
+mse_NAIVE <- mean(error_NAIVE^2)
+
+
 
 # Calculer d'autres mesures d'erreur
 accuracy(for_ADAM_ETS, for_observed, h = 12)
@@ -673,6 +691,8 @@ accuracy(for_STL, for_observed, h = 12)
 accuracy(for_STS, for_observed, h = 12)
 accuracy(for_TBATS, for_observed, h = 12)
 accuracy(for_X13, for_observed, h = 12)
+accuracy(for_NAÏVE, for_observed, h = 12)
+
 
 # Calculer le test DM
 dm.test(error_ADAM_ETS, error_AES, h = length(for_observed))
@@ -684,6 +704,8 @@ dm.test(error_ADAM_ETS, error_STL, h = length(for_observed))
 dm.test(error_ADAM_ETS, error_STS, h = length(for_observed))
 dm.test(error_ADAM_ETS, error_TBATS, h = length(for_observed))
 dm.test(error_ADAM_ETS, error_X13, h = length(for_observed))
+dm.test(error_ADAM_ETS, error_NAIVE, h = length(for_observed))
+
 
 # Calculer le test DM avec h=1
 dm.test(error_ADAM_ETS, error_AES, h = 1)
@@ -695,3 +717,5 @@ dm.test(error_ADAM_ETS, error_STL, h = 1)
 dm.test(error_ADAM_ETS, error_STS, h = 1)
 dm.test(error_ADAM_ETS, error_TBATS, h = 1)
 dm.test(error_ADAM_ETS, error_X13, h = 1)
+dm.test(error_ADAM_ETS, error_NAIVE, h = 1)
+
