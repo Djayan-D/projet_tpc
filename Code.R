@@ -240,13 +240,13 @@ ts_freq_mens_cinema_0020_corr |>
 # Webel-Ollech test
 combined_test(ts_freq_mens_cinema_0020_corr)
 
-P-value: 0  # saisonnalité très forte détectée
+# P-value: 0  : saisonnalité très forte détectée
 
 # Test de Kruskal-Wallis
 month <- cycle(ts_freq_mens_cinema_0020_corr)
 kruskal.test(as.numeric(ts_freq_mens_cinema_0020_corr) ~ factor(month))
 
-p-value < 2.2e-16 < 0.05 # la série est saisonnière
+# p-value < 2.2e-16 < 0.05 : la série est saisonnière
 #--- 3.3.2. périodogramme ---
 
 # pour avoir la série en différence première
