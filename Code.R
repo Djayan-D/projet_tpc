@@ -728,5 +728,5 @@ dm.test(error_NAIVE, error_X13, h = 1)
 
 #---------- 9. Prévision ----------
 
-
 plot(forecast_x13)
+show(forecast_x13)
