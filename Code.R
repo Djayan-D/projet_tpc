@@ -816,57 +816,61 @@ ggplot() +
 # avec des valeurs élevées dans ses Gamma, (Yt+1 = B Yt) plus gamma élevée plus le poids de la valeur passée
 
 
-fit <- tso(ts_freq_mens_cinema_0020)
-adj <- fit$yadj
-adj <- ts(adj)
-
-estim <- 240 
-h <- 12
-format_SARIMA <- matrix(nrow=h, ncol=1)
-
-for(i in 1:h)
-{
-  adj2 <- adj[i:(estim-1+i)]
-  adjdemetra <- ts(adj2, start = c(2000, 1),frequency = 12)
-  
-  myregSARIMA <- auto.arima(adjdemetra, seasonal = TRUE)
-  
-  forexSARIMA <- forecast(myregSARIMA, h = 1)
-  forc <- forexSARIMA$mean[1]
-  format_SARIMA[i,1] <- forc
-}
+# je met tout en #car sinon ça fait planter la session
 
 
-# Affichage des prévisions
-print(format_SARIMA)
-
-
-# Création des mois à afficher
-mois <- format(seq(as.Date("2020-01-01"), by = "month", length.out = 12), "%b %Y")
-
-# Tracer les prévisions
-plot(format_SARIMA, type = "o", main = "Prévisions SARIMA rolling", ylab = "Valeur", xlab = "Mois", col = "navy", lwd = 2, xaxt = "n")
-
-# Ajouter les étiquettes des mois
-axis(1, at = 1:12, labels = mois, las = 2, cex.axis = 0.8)
-
-format_SARIMA_df <- data.frame(mois = format(seq(as.Date("2020-01-01"), by = "month", length.out = 12), "%b %Y"),
-                        value = as.vector(format_SARIMA))  
-
-ts_freq_mens_cinema_2021_df <- data.frame(date = format(seq(as.Date("2020-01-01"), by = "month", length.out = 12), "%b %Y"),
-                                          value = as.vector(ts_freq_mens_cinema_2021))  
-
-# Affichage avec ggplot2
-library(ggplot2)
-ggplot() +
-  geom_line(data = format_SARIMA_df, aes(x = mois, y = value, group = 1), size = 1, color = "navy") +  
-  geom_line(data = ts_freq_mens_cinema_2021_df, aes(x = date, y = value, group = 1),
-            linetype = "dashed", color = "black", size = 1) +  
-  labs(title = "Prévisions sur 12 mois par modèle SARIMA rolling",
-       x = "Mois", y = "Valeur prévue", color = "Modèle") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1),
-        legend.position = "bottom")
+# 
+# fit <- tso(ts_freq_mens_cinema_0020)
+# adj <- fit$yadj
+# adj <- ts(adj)
+# 
+# estim <- 240 
+# h <- 12
+# format_SARIMA <- matrix(nrow=h, ncol=1)
+# 
+# for(i in 1:h)
+# {
+#   adj2 <- adj[i:(estim-1+i)]
+#   adjdemetra <- ts(adj2, start = c(2000, 1),frequency = 12)
+#   
+#   myregSARIMA <- auto.arima(adjdemetra, seasonal = TRUE)
+#   
+#   forexSARIMA <- forecast(myregSARIMA, h = 1)
+#   forc <- forexSARIMA$mean[1]
+#   format_SARIMA[i,1] <- forc
+# }
+# 
+# 
+# # Affichage des prévisions
+# print(format_SARIMA)
+# 
+# 
+# # Création des mois à afficher
+# mois <- format(seq(as.Date("2020-01-01"), by = "month", length.out = 12), "%b %Y")
+# 
+# # Tracer les prévisions
+# plot(format_SARIMA, type = "o", main = "Prévisions SARIMA rolling", ylab = "Valeur", xlab = "Mois", col = "navy", lwd = 2, xaxt = "n")
+# 
+# # Ajouter les étiquettes des mois
+# axis(1, at = 1:12, labels = mois, las = 2, cex.axis = 0.8)
+# 
+# format_SARIMA_df <- data.frame(mois = format(seq(as.Date("2020-01-01"), by = "month", length.out = 12), "%b %Y"),
+#                         value = as.vector(format_SARIMA))  
+# 
+# ts_freq_mens_cinema_2021_df <- data.frame(date = format(seq(as.Date("2020-01-01"), by = "month", length.out = 12), "%b %Y"),
+#                                           value = as.vector(ts_freq_mens_cinema_2021))  
+# 
+# # Affichage avec ggplot2
+# library(ggplot2)
+# ggplot() +
+#   geom_line(data = format_SARIMA_df, aes(x = mois, y = value, group = 1), size = 1, color = "navy") +  
+#   geom_line(data = ts_freq_mens_cinema_2021_df, aes(x = date, y = value, group = 1),
+#             linetype = "dashed", color = "black", size = 1) +  
+#   labs(title = "Prévisions sur 12 mois par modèle SARIMA rolling",
+#        x = "Mois", y = "Valeur prévue", color = "Modèle") +
+#   theme_minimal() +
+#   theme(axis.text.x = element_text(angle = 45, hjust = 1),
+#         legend.position = "bottom")
 
 # Avec le meilleure modèle de la question MSE R²OOS ----
 # TBATS
