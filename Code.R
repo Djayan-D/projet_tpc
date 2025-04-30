@@ -783,26 +783,22 @@ for(i in 1:h)
 # Affichage des prévisions
 print(format)
 
+df_format <- data.frame(format)
 
 # Création des mois à afficher
-mois <- format(seq(as.Date("2020-01-01"), by = "month", length.out = 12), "%b %Y")
+df_format$date <- seq(from = as.Date("2020-01-01"), by = "month", length.out = nrow(df_format))
+
+# Réorganiser les colonnes pour que la colonne "date" soit en première
+df_format <- df_format[, c("date", "format")]
 
 # Tracer les prévisions
-plot(format, type = "o", main = "Prévisions X-13 rolling", ylab = "Valeur", xlab = "Mois", col = "navy", lwd = 2, xaxt = "n")
+plot(df_format, type = "o", main = "Prévisions X-13 rolling", ylab = "Valeur", xlab = "Mois", col = "navy", lwd = 2, xaxt = "n")
 
-# Ajouter les étiquettes des mois
-axis(1, at = 1:12, labels = mois, las = 2, cex.axis = 0.8)
-
-format_df <- data.frame(mois = format(seq(as.Date("2020-01-01"), by = "month", length.out = 12), "%b %Y"),
-                        value = as.vector(format))  
-
-ts_freq_mens_cinema_2021_df <- data.frame(date = format(seq(as.Date("2020-01-01"), by = "month", length.out = 12), "%b %Y"),
-                                          value = as.vector(ts_freq_mens_cinema_2021))  
 
 # Affichage avec ggplot2
 library(ggplot2)
 ggplot() +
-  geom_line(data = format_df, aes(x = mois, y = value, group = 1), size = 1, color = "navy") +  
+  geom_line(data = df_format, aes(x = date, y = format, group = 1), size = 1, color = "navy") +  
   geom_line(data = ts_freq_mens_cinema_2021_df, aes(x = date, y = value, group = 1),
             linetype = "dashed", color = "black", size = 1) +  
   labs(title = "Prévisions sur 12 mois par modèle x13 rolling",
@@ -819,58 +815,54 @@ ggplot() +
 # je met tout en #car sinon ça fait planter la session
 
 
-# 
-# fit <- tso(ts_freq_mens_cinema_0020)
-# adj <- fit$yadj
-# adj <- ts(adj)
-# 
-# estim <- 240 
-# h <- 12
-# format_SARIMA <- matrix(nrow=h, ncol=1)
-# 
-# for(i in 1:h)
-# {
-#   adj2 <- adj[i:(estim-1+i)]
-#   adjdemetra <- ts(adj2, start = c(2000, 1),frequency = 12)
-#   
-#   myregSARIMA <- auto.arima(adjdemetra, seasonal = TRUE)
-#   
-#   forexSARIMA <- forecast(myregSARIMA, h = 1)
-#   forc <- forexSARIMA$mean[1]
-#   format_SARIMA[i,1] <- forc
-# }
-# 
-# 
-# # Affichage des prévisions
-# print(format_SARIMA)
-# 
-# 
-# # Création des mois à afficher
-# mois <- format(seq(as.Date("2020-01-01"), by = "month", length.out = 12), "%b %Y")
-# 
-# # Tracer les prévisions
-# plot(format_SARIMA, type = "o", main = "Prévisions SARIMA rolling", ylab = "Valeur", xlab = "Mois", col = "navy", lwd = 2, xaxt = "n")
-# 
-# # Ajouter les étiquettes des mois
-# axis(1, at = 1:12, labels = mois, las = 2, cex.axis = 0.8)
-# 
-# format_SARIMA_df <- data.frame(mois = format(seq(as.Date("2020-01-01"), by = "month", length.out = 12), "%b %Y"),
-#                         value = as.vector(format_SARIMA))  
-# 
-# ts_freq_mens_cinema_2021_df <- data.frame(date = format(seq(as.Date("2020-01-01"), by = "month", length.out = 12), "%b %Y"),
-#                                           value = as.vector(ts_freq_mens_cinema_2021))  
-# 
-# # Affichage avec ggplot2
-# library(ggplot2)
-# ggplot() +
-#   geom_line(data = format_SARIMA_df, aes(x = mois, y = value, group = 1), size = 1, color = "navy") +  
-#   geom_line(data = ts_freq_mens_cinema_2021_df, aes(x = date, y = value, group = 1),
-#             linetype = "dashed", color = "black", size = 1) +  
-#   labs(title = "Prévisions sur 12 mois par modèle SARIMA rolling",
-#        x = "Mois", y = "Valeur prévue", color = "Modèle") +
-#   theme_minimal() +
-#   theme(axis.text.x = element_text(angle = 45, hjust = 1),
-#         legend.position = "bottom")
+
+fit <- tso(ts_freq_mens_cinema_0020)
+adj <- fit$yadj
+adj <- ts(adj)
+
+estim <- 240
+h <- 12
+format_SARIMA <- matrix(nrow=h, ncol=1)
+
+for(i in 1:h)
+{
+  adj2 <- adj[i:(estim-1+i)]
+  adjdemetra <- ts(adj2, start = c(2000, 1),frequency = 12)
+
+  myregSARIMA <- auto.arima(adjdemetra, seasonal = TRUE)
+
+  forexSARIMA <- forecast(myregSARIMA, h = 1)
+  forc <- forexSARIMA$mean[1]
+  format_SARIMA[i,1] <- forc
+}
+
+
+# Affichage des prévisions
+print(format_SARIMA)
+
+df_format_SARIMA <- data.frame(format_SARIMA)
+
+# Création des mois à afficher
+df_format_SARIMA$date <- seq(from = as.Date("2020-01-01"), by = "month", length.out = nrow(df_format_SARIMA))
+
+# Réorganiser les colonnes pour que la colonne "date" soit en première
+df_format_SARIMA <- df_format_SARIMA[, c("date", "format_SARIMA")]
+
+# Tracer les prévisions
+plot(df_format_SARIMA, type = "o", main = "Prévisions SARIMA rolling", ylab = "Valeur", xlab = "Mois", col = "navy", lwd = 2, xaxt = "n")
+
+
+# Affichage avec ggplot2
+library(ggplot2)
+ggplot() +
+  geom_line(data = df_format_SARIMA, aes(x = date, y = format_SARIMA, group = 1), size = 1, color = "navy") +
+  geom_line(data = ts_freq_mens_cinema_2021_df, aes(x = date, y = value, group = 1),
+            linetype = "dashed", color = "black", size = 1) +
+  labs(title = "Prévisions sur 12 mois par modèle SARIMA rolling",
+       x = "Mois", y = "Valeur prévue", color = "Modèle") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "bottom")
 
 # Avec le meilleure modèle de la question MSE R²OOS ----
 # TBATS
@@ -900,26 +892,22 @@ for(i in 1:h)
 # Affichage des prévisions
 print(format_TBATS)
 
+df_format_TBATS <- data.frame(format_TBATS)
 
 # Création des mois à afficher
-mois <- format(seq(as.Date("2020-01-01"), by = "month", length.out = 12), "%b %Y")
+df_format_TBATS$date <- seq(from = as.Date("2020-01-01"), by = "month", length.out = nrow(df_format_TBATS))
+
+# Réorganiser les colonnes pour que la colonne "date" soit en première
+df_format_TBATS <- df_format_TBATS[, c("date", "format_TBATS")]
 
 # Tracer les prévisions
-plot(format_TBATS, type = "o", main = "Prévisions TBATS rolling", ylab = "Valeur", xlab = "Mois", col = "navy", lwd = 2, xaxt = "n")
+plot(df_format_TBATS, type = "o", main = "Prévisions SARIMA rolling", ylab = "Valeur", xlab = "Mois", col = "navy", lwd = 2, xaxt = "n")
 
-# Ajouter les étiquettes des mois
-axis(1, at = 1:12, labels = mois, las = 2, cex.axis = 0.8)
-
-format_TBATS_df <- data.frame(mois = format(seq(as.Date("2020-01-01"), by = "month", length.out = 12), "%b %Y"),
-                        value = as.vector(format_TBATS))  
-
-ts_freq_mens_cinema_2021_df <- data.frame(date = format(seq(as.Date("2020-01-01"), by = "month", length.out = 12), "%b %Y"),
-                                          value = as.vector(ts_freq_mens_cinema_2021))  
 
 # Affichage avec ggplot2
 library(ggplot2)
 ggplot() +
-  geom_line(data = format_TBATS_df, aes(x = mois, y = value, group = 1), size = 1, color = "navy") +  
+  geom_line(data = df_format_TBATS, aes(x = date, y = format_TBATS, group = 1), size = 1, color = "navy") +  
   geom_line(data = ts_freq_mens_cinema_2021_df, aes(x = date, y = value, group = 1),
             linetype = "dashed", color = "black", size = 1) +  
   labs(title = "Prévisions sur 12 mois par modèle TBATS rolling",
