@@ -792,8 +792,11 @@ df_format$date <- seq(from = as.Date("2020-01-01"), by = "month", length.out = n
 df_format <- df_format[, c("date", "format")]
 
 # Tracer les prévisions
-plot(df_format, type = "o", main = "Prévisions X-13 rolling", ylab = "Valeur", xlab = "Mois", col = "navy", lwd = 2, xaxt = "n")
-
+ggplot(df_format, aes(x = date, y = format)) +
+  geom_line(color = "navy") +
+  scale_x_date(date_labels = "%B %Y", date_breaks = "1 month") +
+  labs(x = "Date", y = "Valeur", title = "Évolution mensuelle") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 # Affichage avec ggplot2
 library(ggplot2)
@@ -849,8 +852,11 @@ df_format_SARIMA$date <- seq(from = as.Date("2020-01-01"), by = "month", length.
 df_format_SARIMA <- df_format_SARIMA[, c("date", "format_SARIMA")]
 
 # Tracer les prévisions
-plot(df_format_SARIMA, type = "o", main = "Prévisions SARIMA rolling", ylab = "Valeur", xlab = "Mois", col = "navy", lwd = 2, xaxt = "n")
-
+ggplot(df_format_SARIMA, aes(x = date, y = format_SARIMA)) +
+  geom_line(color = "navy") +
+  scale_x_date(date_labels = "%B %Y", date_breaks = "1 month") +
+  labs(x = "Date", y = "Valeur", title = "Évolution mensuelle") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 # Affichage avec ggplot2
 library(ggplot2)
@@ -901,8 +907,11 @@ df_format_TBATS$date <- seq(from = as.Date("2020-01-01"), by = "month", length.o
 df_format_TBATS <- df_format_TBATS[, c("date", "format_TBATS")]
 
 # Tracer les prévisions
-plot(df_format_TBATS, type = "o", main = "Prévisions SARIMA rolling", ylab = "Valeur", xlab = "Mois", col = "navy", lwd = 2, xaxt = "n")
-
+ggplot(df_format_TBATS, aes(x = date, y = format_TBATS)) +
+  geom_line(color = "navy") +
+  scale_x_date(date_labels = "%B %Y", date_breaks = "1 month") +
+  labs(x = "Date", y = "Valeur", title = "Évolution mensuelle") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 # Affichage avec ggplot2
 library(ggplot2)
